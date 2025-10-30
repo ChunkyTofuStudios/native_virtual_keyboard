@@ -26,34 +26,55 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(title: const Text('Native Virtual Keyboard')),
+        appBar: AppBar(
+          title: const Text('Native Virtual Keyboard'),
+          backgroundColor: const Color.fromARGB(255, 135, 191, 237),
+        ),
         body: Center(
           child: Column(
             children: [
-              DropdownButton<KeyboardPlatform?>(
-                value: _selectedPlatform,
-                items: [
-                  const DropdownMenuItem(
-                    value: null,
-                    child: Text('Auto-detect'),
-                  ),
-                  ...KeyboardPlatform.values.map(
-                    (platform) => DropdownMenuItem(
-                      value: platform,
-                      child: Text(platform.name),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('Platform:'),
+                        SizedBox(width: 6),
+                        DropdownButton<KeyboardPlatform?>(
+                          value: _selectedPlatform,
+                          items: [
+                            const DropdownMenuItem(
+                              value: null,
+                              child: Text('Auto-detect'),
+                            ),
+                            ...KeyboardPlatform.values.map(
+                              (platform) => DropdownMenuItem(
+                                value: platform,
+                                child: Text(platform.name),
+                              ),
+                            ),
+                          ],
+                          onChanged: (value) =>
+                              setState(() => _selectedPlatform = value),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
-                onChanged: (value) => setState(() => _selectedPlatform = value),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: TextField(
-                  controller: _textController,
-                  readOnly: true,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                  ),
+                    SizedBox(height: 16),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 22),
+                      child: TextField(
+                        controller: _textController,
+                        readOnly: true,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                        ),
+                        minLines: 5,
+                        maxLines: 5,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               VirtualKeyboard(
@@ -62,9 +83,13 @@ class _MyAppState extends State<MyApp> {
                   layout: EnglishQwertyKeyboardLayout(),
                   onKeyPress: (key) {
                     final text = _textController.text;
-                    if (key == VirtualKeyboardKey.backspace &&
-                        text.isNotEmpty) {
-                      _textController.text = text.substring(0, text.length - 1);
+                    if (key == VirtualKeyboardKey.backspace) {
+                      if (text.isNotEmpty) {
+                        _textController.text = text.substring(
+                          0,
+                          text.length - 1,
+                        );
+                      }
                       return;
                     }
 
