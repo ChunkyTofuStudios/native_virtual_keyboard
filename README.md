@@ -6,7 +6,7 @@ An almost pixel perfect Flutter replica of iOS and Android native keyboards.
 
 The original iOS 26 (Liquid Glass) keyboard on the left, the Flutter replica is on the right.
 
-![iOS 26 Showcase](docs/ios_26_showcase.gif)
+![iOS 26 Showcase](doc/ios_26_showcase.gif)
 
 ## Getting Started
 
