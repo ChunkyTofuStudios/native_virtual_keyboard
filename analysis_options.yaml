@@ -1,0 +1,13 @@
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    prefer_const_constructors: true
+    prefer_single_quotes: true
+    directives_ordering: true
+    use_null_aware_elements: true
+
+analyzer:
+  exclude: [lib/gen/**, lib/**.g.dart, /lib/**.freezed.dart]
+  errors:
+    todo: ignore

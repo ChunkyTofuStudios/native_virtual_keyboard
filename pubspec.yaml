@@ -1,0 +1,33 @@
+name: native_virtual_keyboard
+description: "An almost pixel perfect Flutter replica of iOS and Android native keyboards."
+version: 0.1.0
+homepage: https://chunkytofustudios.com
+repository: https://github.com/ChunkyTofuStudios/native_virtual_keyboard
+
+environment:
+  sdk: ^3.9.2
+  flutter: ">=3.3.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  collection: any
+  auto_size_text: ^3.0.0
+  device_info_plus: ^12.2.0
+  material_symbols_icons: ^4.2874.0
+  logging: ^1.3.0
+
+dev_dependencies:
+  flutter_lints: ^5.0.0
+  build_runner: ^2.7.1
+  flutter_gen_runner: ^5.12.0
+
+flutter:
+  generate: true
+  assets:
+    - assets/images/
+
+flutter_gen:
+  assets:
+    outputs:
+      package_parameter_enabled: true
