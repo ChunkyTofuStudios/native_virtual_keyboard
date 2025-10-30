@@ -7,6 +7,4 @@ targets:
           integrations:
             image: true
             flutter_svg: true
-          images:
-            parse_animation: true
           parse_metadata: true
