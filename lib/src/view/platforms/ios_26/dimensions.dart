@@ -10,10 +10,10 @@ final class Ios26KeyboardDimensionsConfig extends KeyboardDimensionsConfig {
         keyBorderRadiusWidthRatio: 24 / 99,
         specialKeyWidthMultiplier: 134 / 99,
         horzToVertSpacingRatio: 18 / 33,
-        overlayWidthToWidthRatio: 1070 / 623,
+        overlayWidthToWidthRatio: 1070 / 624,
         overlayAspectRatio:
-            Assets.images.ios18KeyPressedOverlay.size!.width /
-            Assets.images.ios18KeyPressedOverlay.size!.height,
+            Assets.images.ios26KeyPressedOverlay.size!.width /
+            Assets.images.ios26KeyPressedOverlay.size!.height,
         keyElevation: 0,
         topPaddingToWidthRatio: 72 / 99,
         topBorderRadiusWidthRatio: 78 / 99,

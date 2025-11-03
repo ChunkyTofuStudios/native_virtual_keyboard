@@ -23,8 +23,17 @@ class $AssetsImagesGen {
     size: Size(1070.0, 1840.0),
   );
 
+  /// File path: assets/images/ios_26_key_pressed_overlay.svg
+  SvgGenImage get ios26KeyPressedOverlay => const SvgGenImage(
+    'assets/images/ios_26_key_pressed_overlay.svg',
+    size: Size(1070.0, 2147.0),
+  );
+
   /// List of all assets
-  List<SvgGenImage> get values => [ios18KeyPressedOverlay];
+  List<SvgGenImage> get values => [
+    ios18KeyPressedOverlay,
+    ios26KeyPressedOverlay,
+  ];
 }
 
 class Assets {

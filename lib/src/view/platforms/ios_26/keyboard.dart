@@ -45,7 +45,7 @@ class _KeyPressOverlay extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Assets.images.ios18KeyPressedOverlay.svg(
+        Assets.images.ios26KeyPressedOverlay.svg(
           colorFilter: ColorFilter.mode(
             params.theme.keyTheme.pressedBackgroundColor,
             BlendMode.srcIn,
