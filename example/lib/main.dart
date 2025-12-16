@@ -71,7 +71,7 @@ class _MyAppState extends State<MyApp> {
                       ),
                       const SizedBox(height: 16),
                       // Theme Controls
-                      SwitchListTile(
+            SwitchListTile(
               title: const Text('Custom Colors (Red/Yellow/Orange)'),
               value: _customColors,
               onChanged: (value) {
@@ -118,8 +118,9 @@ class _MyAppState extends State<MyApp> {
                 // Custom colors
                 backgroundColor: _customColors ? Colors.red.shade100 : null,
                 keyColor: _customColors ? Colors.yellow.shade200 : null,
-                keyIconColor: _customColors ? Colors.red : null,
                 specialKeyColor: _customColors ? Colors.orange.shade200 : null,
+                keyIconColor: _customColors ? Colors.red : null,
+                
                 showEnter: _showEnter,
                 showBackspace: _showBackspace,
                 // Custom Styles

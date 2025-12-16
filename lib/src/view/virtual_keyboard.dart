@@ -44,6 +44,12 @@ final class VirtualKeyboard extends StatelessWidget {
   /// Whether to show the backspace key.
   final bool showBackspace;
 
+  /// The shadows of the keys.
+  final List<BoxShadow>? keyShadow;
+
+  /// The inner shadows of the keys.
+  final List<BoxShadow>? keyInnerShadow;
+
   const VirtualKeyboard({
     super.key,
     this.platform,
@@ -56,6 +62,8 @@ final class VirtualKeyboard extends StatelessWidget {
     this.textTheme,
     this.showEnter = true,
     this.showBackspace = true,
+    this.keyShadow,
+    this.keyInnerShadow,
   });
 
   @override
@@ -81,6 +89,8 @@ final class VirtualKeyboard extends StatelessWidget {
             specialKeyColor: specialKeyColor,
             showEnter: showEnter,
             showBackspace: showBackspace,
+            keyShadow: keyShadow,
+            keyInnerShadow: keyInnerShadow,
           ),
           KeyboardPlatform.ios18 => Ios18Keyboard(
             controller: controller,
@@ -92,6 +102,8 @@ final class VirtualKeyboard extends StatelessWidget {
             specialKeyColor: specialKeyColor,
             showEnter: showEnter,
             showBackspace: showBackspace,
+            keyShadow: keyShadow,
+            keyInnerShadow: keyInnerShadow,
           ),
           KeyboardPlatform.ios26 => Ios26Keyboard(
             controller: controller,
@@ -103,6 +115,8 @@ final class VirtualKeyboard extends StatelessWidget {
             specialKeyColor: specialKeyColor,
             showEnter: showEnter,
             showBackspace: showBackspace,
+            keyShadow: keyShadow,
+            keyInnerShadow: keyInnerShadow,
           ),
         };
       },

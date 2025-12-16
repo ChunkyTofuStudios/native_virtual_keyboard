@@ -7,7 +7,7 @@ final class AndroidKeyboardDimensionsConfig extends KeyboardDimensionsConfig {
         keyGapWidthRatio: 14 / 93,
         keyAspectRatio: 93 / 123,
         keyBorderRadiusWidthRatio: 19 / 93,
-        specialKeyWidthMultiplier: 147 / 93,
+        specialKeyWidthMultiplier: 1.5,
         horzToVertSpacingRatio: 14 / 31,
         overlayWidthToWidthRatio: 152 / 93,
         overlayAspectRatio: 1,

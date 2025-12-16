@@ -8,7 +8,7 @@ final class Ios18KeyboardDimensionsConfig extends KeyboardDimensionsConfig {
         keyGapWidthRatio: 10 / 64,
         keyAspectRatio: 64 / 78,
         keyBorderRadiusWidthRatio: 8 / 64,
-        specialKeyWidthMultiplier: 81 / 64,
+        specialKeyWidthMultiplier: 1.5,
         horzToVertSpacingRatio: 10 / 18,
         overlayWidthToWidthRatio: 1070 / 623,
         overlayAspectRatio:

@@ -24,6 +24,8 @@ abstract class BaseKeyboard extends StatefulWidget {
   final TextTheme? textTheme;
   final bool showEnter;
   final bool showBackspace;
+  final List<BoxShadow>? keyShadow;
+  final List<BoxShadow>? keyInnerShadow;
 
   const BaseKeyboard({
     super.key,
@@ -36,6 +38,8 @@ abstract class BaseKeyboard extends StatefulWidget {
     this.textTheme,
     this.showEnter = true,
     this.showBackspace = true,
+    this.keyShadow,
+    this.keyInnerShadow,
   });
 
   KeyboardTheme getTheme(Brightness brightness);
@@ -60,10 +64,14 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
       backgroundColor: widget.backgroundColor,
       keyTheme: defaultTheme.keyTheme.copyWith(
         backgroundColor: widget.keyColor,
+        shadows: widget.keyShadow,
+        innerShadows: widget.keyInnerShadow,
       ),
       specialKeyTheme: defaultTheme.specialKeyTheme.copyWith(
         backgroundColor: widget.specialKeyColor ?? widget.keyColor,
         foregroundColor: widget.keyIconColor,
+        shadows: widget.keyShadow, // Apply same shadow to special keys for consistency
+        innerShadows: null, // User requested no inner shadow for special keys
       ),
     );
 
@@ -300,54 +308,107 @@ class _KeyButton extends StatelessWidget {
       ? data.theme.specialKeyTheme.foregroundColor
       : data.theme.keyTheme.foregroundColor;
 
+  List<BoxShadow>? _shadows() => data.key.special
+      ? data.theme.specialKeyTheme.shadows
+      : data.theme.keyTheme.shadows;
+
+  List<BoxShadow>? _innerShadows() => data.key.special
+      ? data.theme.specialKeyTheme.innerShadows
+      : data.theme.keyTheme.innerShadows;
+
   @override
   Widget build(BuildContext context) {
+    final bgColor = _backgroundColor();
+    final shadows = _shadows();
+    final innerShadows = _innerShadows();
+    
     return SizedBox(
       width: data.size.width,
       height: data.size.height,
-      child: Card(
-        margin: EdgeInsets.zero,
-        elevation: data.elevation,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(data.borderRadius),
-        ),
+      child: CustomPaint(
+        foregroundPainter: innerShadows != null && innerShadows.isNotEmpty
+            ? _InnerShadowPainter(
+                shadows: innerShadows,
+                borderRadius: BorderRadius.circular(data.borderRadius),
+              )
+            : null,
         child: Container(
           decoration: BoxDecoration(
-            color: _backgroundColor(),
+            color: bgColor,
             borderRadius: BorderRadius.circular(data.borderRadius),
+            boxShadow: shadows,
           ),
           child: Center(
-            child: data.key.special
-                ? FractionallySizedBox(
-                    widthFactor: 0.55,
-                    heightFactor: 0.8,
-                    child: FittedBox(
-                      child: Icon(
-                        data.key.icon,
-                        fill:
-                            isPressed &&
-                                data.theme.specialKeyTheme.pressedFillIcon
-                            ? 1
-                            : 0,
-                        weight: 600,
-                        color: _foregroundColor(),
-                      ),
-                    ),
-                  )
-                : AutoSizeText(
-                    data.key.text,
-                    style: (data.controller.textTheme ??
-                            data.keyTextStyle ??
-                            data.textTheme?.bodyLarge)
-                        ?.copyWith(color: _foregroundColor())
-                        .merge(data.keyTextStyle),
-                    minFontSize: 4,
-                    maxLines: 1,
-                    group: data.autoSizeGroup,
-                  ),
+            child: _buildKeyContent(context),
           ),
         ),
       ),
     );
   }
+
+  Widget _buildKeyContent(BuildContext context) {
+    if (data.key.special) {
+       return FractionallySizedBox(
+            widthFactor: 0.55,
+            heightFactor: 0.8,
+            child: FittedBox(
+              child: Icon(
+                data.key.icon,
+                fill: isPressed && (data.theme.specialKeyTheme.pressedFillIcon ?? false)
+                    ? 1
+                    : 0,
+                weight: 600,
+                color: _foregroundColor(),
+              ),
+            ),
+       );
+    }
+     
+     return AutoSizeText(
+        data.key.text!,
+        style: (data.controller.textTheme ??
+                data.keyTextStyle ??
+                data.textTheme?.bodyLarge)
+            ?.copyWith(color: _foregroundColor())
+            .merge(data.keyTextStyle),
+        minFontSize: 4,
+        maxLines: 1,
+        group: data.autoSizeGroup,
+      );
+  }
+}
+
+class _InnerShadowPainter extends CustomPainter {
+  final List<BoxShadow> shadows;
+  final BorderRadius borderRadius;
+
+  _InnerShadowPainter({required this.shadows, required this.borderRadius});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rect = Offset.zero & size;
+    final rrect = borderRadius.toRRect(rect);
+
+    canvas.clipRRect(rrect);
+
+    for (final shadow in shadows) {
+      final paint = shadow.toPaint();
+      final spread = shadow.spreadRadius;
+      final blur = shadow.blurRadius;
+      final offset = shadow.offset;
+
+      canvas.save();
+       
+      final holePath = Path()
+        ..fillType = PathFillType.evenOdd
+        ..addRect(rect.inflate(blur * 2 + spread + 10.0))
+        ..addRRect(rrect.shift(offset)); 
+      
+      canvas.drawPath(holePath, paint);
+      canvas.restore();
+    }
+  }
+
+  @override
+  bool shouldRepaint(_InnerShadowPainter oldDelegate) => true;
 }

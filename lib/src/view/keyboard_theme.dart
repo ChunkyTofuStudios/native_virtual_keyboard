@@ -32,22 +32,34 @@ final class KeyboardKeyTheme {
   /// The color of the text.
   final Color foregroundColor;
 
+  /// The shadows of the keys.
+  final List<BoxShadow>? shadows;
+
+  /// The inner shadows of the keys.
+  final List<BoxShadow>? innerShadows;
+
   const KeyboardKeyTheme({
     required this.backgroundColor,
     required this.pressedBackgroundColor,
     required this.foregroundColor,
+    this.shadows,
+    this.innerShadows,
   });
 
   KeyboardKeyTheme copyWith({
     Color? backgroundColor,
     Color? pressedBackgroundColor,
     Color? foregroundColor,
+    List<BoxShadow>? shadows,
+    List<BoxShadow>? innerShadows,
   }) {
     return KeyboardKeyTheme(
       backgroundColor: backgroundColor ?? this.backgroundColor,
       pressedBackgroundColor:
           pressedBackgroundColor ?? this.pressedBackgroundColor,
       foregroundColor: foregroundColor ?? this.foregroundColor,
+      shadows: shadows ?? this.shadows,
+      innerShadows: innerShadows ?? this.innerShadows,
     );
   }
 }
@@ -63,16 +75,19 @@ final class KeyboardSpecialKeyTheme extends KeyboardKeyTheme {
     required super.backgroundColor,
     required super.pressedBackgroundColor,
     required super.foregroundColor,
+    super.shadows,
+    super.innerShadows,
     required this.pressedOverlayColor,
     required this.pressedFillIcon,
   });
 
-  // Removed @override since the signature is different (more parameters)
-  // and we are not implementing an interface method strictly here in a polymorphic way for these extra params.
+  @override
   KeyboardSpecialKeyTheme copyWith({
     Color? backgroundColor,
     Color? pressedBackgroundColor,
     Color? foregroundColor,
+    List<BoxShadow>? shadows,
+    List<BoxShadow>? innerShadows,
     Color? pressedOverlayColor,
     bool? pressedFillIcon,
   }) {
@@ -81,6 +96,8 @@ final class KeyboardSpecialKeyTheme extends KeyboardKeyTheme {
       pressedBackgroundColor:
           pressedBackgroundColor ?? this.pressedBackgroundColor,
       foregroundColor: foregroundColor ?? this.foregroundColor,
+      shadows: shadows ?? this.shadows,
+      innerShadows: innerShadows ?? this.innerShadows,
       pressedOverlayColor: pressedOverlayColor ?? this.pressedOverlayColor,
       pressedFillIcon: pressedFillIcon ?? this.pressedFillIcon,
     );
