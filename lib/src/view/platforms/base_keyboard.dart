@@ -19,8 +19,11 @@ abstract class BaseKeyboard extends StatefulWidget {
   final Color? backgroundColor;
   final Color? keyColor;
   final Color? keyIconColor;
+  final Color? specialKeyColor;
   final TextStyle? keyTextStyle;
   final TextTheme? textTheme;
+  final bool showEnter;
+  final bool showBackspace;
 
   const BaseKeyboard({
     super.key,
@@ -28,8 +31,11 @@ abstract class BaseKeyboard extends StatefulWidget {
     this.backgroundColor,
     this.keyColor,
     this.keyIconColor,
+    this.specialKeyColor,
     this.keyTextStyle,
     this.textTheme,
+    this.showEnter = true,
+    this.showBackspace = true,
   });
 
   KeyboardTheme getTheme(Brightness brightness);
@@ -56,7 +62,7 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
         backgroundColor: widget.keyColor,
       ),
       specialKeyTheme: defaultTheme.specialKeyTheme.copyWith(
-        backgroundColor: widget.keyColor,
+        backgroundColor: widget.specialKeyColor ?? widget.keyColor,
         foregroundColor: widget.keyIconColor,
       ),
     );
@@ -103,27 +109,38 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
                 children: [
                   for (final (index, key) in row.indexed) ...[
                     if (key.special && index > 0) const Spacer(),
-                    _Key(
-                      data: KeyParams(
-                        key: key,
-                        size: key.special
-                            ? dimensions.keyDimensions.specialSize
-                            : dimensions.keyDimensions.size,
-                        borderRadius: dimensions.keyDimensions.borderRadius,
-                        elevation: dimensions.keyDimensions.elevation,
-                        overlaySize: dimensions.keyDimensions.overlaySize,
-                        padding: EdgeInsets.symmetric(
-                          horizontal:
-                              dimensions.keyDimensions.horizontalSpacing / 2,
-                          vertical:
-                              dimensions.keyDimensions.verticalSpacing / 2,
+                    Visibility(
+                      visible: (key == VirtualKeyboardKey.enter &&
+                              !widget.showEnter) ||
+                          (key == VirtualKeyboardKey.backspace &&
+                              !widget.showBackspace)
+                          ? false
+                          : true,
+                      maintainSize: true,
+                      maintainAnimation: true,
+                      maintainState: true,
+                      child: _Key(
+                        data: KeyParams(
+                          key: key,
+                          size: key.special
+                              ? dimensions.keyDimensions.specialSize
+                              : dimensions.keyDimensions.size,
+                          borderRadius: dimensions.keyDimensions.borderRadius,
+                          elevation: dimensions.keyDimensions.elevation,
+                          overlaySize: dimensions.keyDimensions.overlaySize,
+                          padding: EdgeInsets.symmetric(
+                            horizontal:
+                                dimensions.keyDimensions.horizontalSpacing / 2,
+                            vertical:
+                                dimensions.keyDimensions.verticalSpacing / 2,
+                          ),
+                          theme: theme,
+                          autoSizeGroup: _autoSizeGroup,
+                          overlayFollowerBuilder: widget.overlayFollowerBuilder(),
+                          controller: widget.controller,
+                          keyTextStyle: effectiveKeyTextStyle,
+                          textTheme: effectiveTextTheme,
                         ),
-                        theme: theme,
-                        autoSizeGroup: _autoSizeGroup,
-                        overlayFollowerBuilder: widget.overlayFollowerBuilder(),
-                        controller: widget.controller,
-                        keyTextStyle: effectiveKeyTextStyle,
-                        textTheme: effectiveTextTheme,
                       ),
                     ),
                     if (key.special && index < row.length - 1) const Spacer(),

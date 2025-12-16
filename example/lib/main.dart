@@ -19,6 +19,8 @@ class _MyAppState extends State<MyApp> {
   // Theming state
   bool _customColors = false;
   bool _customStyle = false;
+  bool _showEnter = true;
+  bool _showBackspace = true;
 
   @override
   void dispose() {
@@ -70,15 +72,29 @@ class _MyAppState extends State<MyApp> {
                       const SizedBox(height: 16),
                       // Theme Controls
                       SwitchListTile(
-                        title: const Text('Custom Colors (Red/Yellow)'),
-                        value: _customColors,
-                        onChanged: (v) => setState(() => _customColors = v),
-                      ),
-                      SwitchListTile(
-                        title: const Text('Custom Font (Serif/Bold)'),
-                        value: _customStyle,
-                        onChanged: (v) => setState(() => _customStyle = v),
-                      ),
+              title: const Text('Custom Colors (Red/Yellow/Orange)'),
+              value: _customColors,
+              onChanged: (value) {
+                setState(() {
+                  _customColors = value;
+                });
+              },
+            ),
+            SwitchListTile(
+              title: const Text('Custom Font (Serif/Bold)'),
+              value: _customStyle,
+              onChanged: (v) => setState(() => _customStyle = v),
+            ),
+            SwitchListTile(
+              title: const Text('Show Enter Key'),
+              value: _showEnter,
+              onChanged: (v) => setState(() => _showEnter = v),
+            ),
+            SwitchListTile(
+              title: const Text('Show Backspace Key'),
+              value: _showBackspace,
+              onChanged: (v) => setState(() => _showBackspace = v),
+            ),
                       const SizedBox(height: 16),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 22),
@@ -103,6 +119,9 @@ class _MyAppState extends State<MyApp> {
                 backgroundColor: _customColors ? Colors.red.shade100 : null,
                 keyColor: _customColors ? Colors.yellow.shade200 : null,
                 keyIconColor: _customColors ? Colors.red : null,
+                specialKeyColor: _customColors ? Colors.orange.shade200 : null,
+                showEnter: _showEnter,
+                showBackspace: _showBackspace,
                 // Custom Styles
                 keyTextStyle: _customStyle
                     ? const TextStyle(
@@ -116,7 +135,7 @@ class _MyAppState extends State<MyApp> {
                 textTheme: _customStyle
                     ? TextTheme(
                         bodyLarge: TextStyle(
-                          fontSize: 24,
+                          fontSize: 22, // Changed from 24 to 22
                           color: Colors.blue.shade900,
                         ),
                       )

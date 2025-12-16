@@ -35,15 +35,27 @@ final class VirtualKeyboard extends StatelessWidget {
   /// The color of the icons on the keys.
   final Color? keyIconColor;
 
+  /// The background color of the special keys.
+  final Color? specialKeyColor;
+
+  /// Whether to show the enter key.
+  final bool showEnter;
+
+  /// Whether to show the backspace key.
+  final bool showBackspace;
+
   const VirtualKeyboard({
     super.key,
     this.platform,
     required this.controller,
     this.backgroundColor,
     this.keyColor,
+    this.keyIconColor,
+    this.specialKeyColor,
     this.keyTextStyle,
     this.textTheme,
-    this.keyIconColor,
+    this.showEnter = true,
+    this.showBackspace = true,
   });
 
   @override
@@ -66,6 +78,9 @@ final class VirtualKeyboard extends StatelessWidget {
             keyTextStyle: keyTextStyle,
             textTheme: textTheme,
             keyIconColor: keyIconColor,
+            specialKeyColor: specialKeyColor,
+            showEnter: showEnter,
+            showBackspace: showBackspace,
           ),
           KeyboardPlatform.ios18 => Ios18Keyboard(
             controller: controller,
@@ -74,6 +89,9 @@ final class VirtualKeyboard extends StatelessWidget {
             keyTextStyle: keyTextStyle,
             textTheme: textTheme,
             keyIconColor: keyIconColor,
+            specialKeyColor: specialKeyColor,
+            showEnter: showEnter,
+            showBackspace: showBackspace,
           ),
           KeyboardPlatform.ios26 => Ios26Keyboard(
             controller: controller,
@@ -82,6 +100,9 @@ final class VirtualKeyboard extends StatelessWidget {
             keyTextStyle: keyTextStyle,
             textTheme: textTheme,
             keyIconColor: keyIconColor,
+            specialKeyColor: specialKeyColor,
+            showEnter: showEnter,
+            showBackspace: showBackspace,
           ),
         };
       },
