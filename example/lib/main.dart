@@ -16,6 +16,10 @@ class _MyAppState extends State<MyApp> {
   KeyboardPlatform? _selectedPlatform;
   final _textController = TextEditingController();
 
+  // Theming state
+  bool _customColors = false;
+  bool _customStyle = false;
+
   @override
   void dispose() {
     _textController.dispose();
@@ -34,51 +38,89 @@ class _MyAppState extends State<MyApp> {
           child: Column(
             children: [
               Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text('Platform:'),
-                        SizedBox(width: 6),
-                        DropdownButton<KeyboardPlatform?>(
-                          value: _selectedPlatform,
-                          items: [
-                            const DropdownMenuItem(
-                              value: null,
-                              child: Text('Auto-detect'),
-                            ),
-                            ...KeyboardPlatform.values.map(
-                              (platform) => DropdownMenuItem(
-                                value: platform,
-                                child: Text(platform.name),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text('Platform:'),
+                          const SizedBox(width: 6),
+                          DropdownButton<KeyboardPlatform?>(
+                            value: _selectedPlatform,
+                            items: [
+                              const DropdownMenuItem(
+                                value: null,
+                                child: Text('Auto-detect'),
                               ),
-                            ),
-                          ],
-                          onChanged: (value) =>
-                              setState(() => _selectedPlatform = value),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 16),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 22),
-                      child: TextField(
-                        controller: _textController,
-                        readOnly: true,
-                        decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                        ),
-                        minLines: 5,
-                        maxLines: 5,
+                              ...KeyboardPlatform.values.map(
+                                (platform) => DropdownMenuItem(
+                                  value: platform,
+                                  child: Text(platform.name),
+                                ),
+                              ),
+                            ],
+                            onChanged: (value) =>
+                                setState(() => _selectedPlatform = value),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 16),
+                      // Theme Controls
+                      SwitchListTile(
+                        title: const Text('Custom Colors (Red/Yellow)'),
+                        value: _customColors,
+                        onChanged: (v) => setState(() => _customColors = v),
+                      ),
+                      SwitchListTile(
+                        title: const Text('Custom Font (Serif/Bold)'),
+                        value: _customStyle,
+                        onChanged: (v) => setState(() => _customStyle = v),
+                      ),
+                      const SizedBox(height: 16),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 22),
+                        child: TextField(
+                          controller: _textController,
+                          readOnly: true,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Input',
+                          ),
+                          minLines: 3,
+                          maxLines: 3,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               VirtualKeyboard(
                 platform: _selectedPlatform,
+                // Custom colors
+                backgroundColor: _customColors ? Colors.red.shade100 : null,
+                keyColor: _customColors ? Colors.yellow.shade200 : null,
+                keyIconColor: _customColors ? Colors.red : null,
+                // Custom Styles
+                keyTextStyle: _customStyle
+                    ? const TextStyle(
+                        color: Colors.blue,
+                        fontFamily: 'Serif',
+                        fontWeight: FontWeight.bold,
+                        fontStyle: FontStyle.italic,
+                      )
+                    : null,
+                // Example of passing a TextTheme
+                textTheme: _customStyle
+                    ? TextTheme(
+                        bodyLarge: TextStyle(
+                          fontSize: 24,
+                          color: Colors.blue.shade900,
+                        ),
+                      )
+                    : null,
                 controller: VirtualKeyboardController(
                   layout: EnglishQwertyKeyboardLayout(),
                   onKeyPress: (key) {

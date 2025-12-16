@@ -7,7 +7,15 @@ import 'package:native_virtual_keyboard/src/view/platforms/android/theme.dart';
 import 'package:native_virtual_keyboard/src/view/platforms/base_keyboard.dart';
 
 final class AndroidKeyboard extends BaseKeyboard {
-  const AndroidKeyboard({super.key, required super.controller});
+  const AndroidKeyboard({
+    super.key,
+    required super.controller,
+    super.backgroundColor,
+    super.keyColor,
+    super.keyTextStyle,
+    super.textTheme,
+    super.keyIconColor,
+  });
 
   @override
   KeyboardTheme getTheme(Brightness brightness) {

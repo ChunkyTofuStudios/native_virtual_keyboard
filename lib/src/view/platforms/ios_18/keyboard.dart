@@ -9,7 +9,15 @@ import 'package:native_virtual_keyboard/src/view/platforms/ios_18/theme.dart';
 import 'package:native_virtual_keyboard/src/view/shadex.dart';
 
 final class Ios18Keyboard extends BaseKeyboard {
-  const Ios18Keyboard({super.key, required super.controller});
+  const Ios18Keyboard({
+    super.key,
+    required super.controller,
+    super.backgroundColor,
+    super.keyColor,
+    super.keyTextStyle,
+    super.textTheme,
+    super.keyIconColor,
+  });
 
   @override
   KeyboardTheme getTheme(Brightness brightness) {

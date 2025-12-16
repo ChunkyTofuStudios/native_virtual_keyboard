@@ -16,8 +16,21 @@ typedef OverlayFollowerBuilder =
 
 abstract class BaseKeyboard extends StatefulWidget {
   final VirtualKeyboardController controller;
+  final Color? backgroundColor;
+  final Color? keyColor;
+  final Color? keyIconColor;
+  final TextStyle? keyTextStyle;
+  final TextTheme? textTheme;
 
-  const BaseKeyboard({super.key, required this.controller});
+  const BaseKeyboard({
+    super.key,
+    required this.controller,
+    this.backgroundColor,
+    this.keyColor,
+    this.keyIconColor,
+    this.keyTextStyle,
+    this.textTheme,
+  });
 
   KeyboardTheme getTheme(Brightness brightness);
 
@@ -34,7 +47,23 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = widget.getTheme(MediaQuery.platformBrightnessOf(context));
+    final defaultTheme =
+        widget.getTheme(MediaQuery.platformBrightnessOf(context));
+    // Apply overrides
+    final theme = defaultTheme.copyWith(
+      backgroundColor: widget.backgroundColor,
+      keyTheme: defaultTheme.keyTheme.copyWith(
+        backgroundColor: widget.keyColor,
+      ),
+      specialKeyTheme: defaultTheme.specialKeyTheme.copyWith(
+        backgroundColor: widget.keyColor,
+        foregroundColor: widget.keyIconColor,
+      ),
+    );
+
+    // Calculate effective text style for keys
+    final effectiveTextTheme = widget.textTheme ?? TextTheme.of(context);
+    final TextStyle? effectiveKeyTextStyle = widget.keyTextStyle;
     final dimensions = KeyboardDimensions.compute(
       widget.getDimensionsConfig(),
       MediaQuery.sizeOf(context).width,
@@ -93,6 +122,8 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
                         autoSizeGroup: _autoSizeGroup,
                         overlayFollowerBuilder: widget.overlayFollowerBuilder(),
                         controller: widget.controller,
+                        keyTextStyle: effectiveKeyTextStyle,
+                        textTheme: effectiveTextTheme,
                       ),
                     ),
                     if (key.special && index < row.length - 1) const Spacer(),
@@ -118,6 +149,8 @@ final class KeyParams {
   final AutoSizeGroup autoSizeGroup;
   final OverlayFollowerBuilder overlayFollowerBuilder;
   final VirtualKeyboardController controller;
+  final TextStyle? keyTextStyle;
+  final TextTheme? textTheme;
 
   const KeyParams({
     required this.key,
@@ -130,6 +163,8 @@ final class KeyParams {
     required this.autoSizeGroup,
     required this.overlayFollowerBuilder,
     required this.controller,
+    this.keyTextStyle,
+    this.textTheme,
   });
 }
 
@@ -284,10 +319,11 @@ class _KeyButton extends StatelessWidget {
                   )
                 : AutoSizeText(
                     data.key.text,
-                    style:
-                        (data.controller.textTheme ??
-                                TextTheme.of(context).bodyLarge)
-                            ?.copyWith(color: _foregroundColor()),
+                    style: (data.controller.textTheme ??
+                            data.keyTextStyle ??
+                            data.textTheme?.bodyLarge)
+                        ?.copyWith(color: _foregroundColor())
+                        .merge(data.keyTextStyle),
                     minFontSize: 4,
                     maxLines: 1,
                     group: data.autoSizeGroup,

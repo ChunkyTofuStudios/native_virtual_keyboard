@@ -20,7 +20,31 @@ final class VirtualKeyboard extends StatelessWidget {
   /// The controller for the keyboard.
   final VirtualKeyboardController controller;
 
-  const VirtualKeyboard({super.key, this.platform, required this.controller});
+  /// The background color of the keyboard.
+  final Color? backgroundColor;
+
+  /// The color of the keys.
+  final Color? keyColor;
+
+  /// The text style of the keys.
+  final TextStyle? keyTextStyle;
+
+  /// The text theme to use for the keyboard.
+  final TextTheme? textTheme;
+
+  /// The color of the icons on the keys.
+  final Color? keyIconColor;
+
+  const VirtualKeyboard({
+    super.key,
+    this.platform,
+    required this.controller,
+    this.backgroundColor,
+    this.keyColor,
+    this.keyTextStyle,
+    this.textTheme,
+    this.keyIconColor,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -35,9 +59,30 @@ final class VirtualKeyboard extends StatelessWidget {
         final platform = _getPlatform(snapshot.data);
         _log.fine('Platform identified as: ${platform.name}');
         return switch (platform) {
-          KeyboardPlatform.android => AndroidKeyboard(controller: controller),
-          KeyboardPlatform.ios18 => Ios18Keyboard(controller: controller),
-          KeyboardPlatform.ios26 => Ios26Keyboard(controller: controller),
+          KeyboardPlatform.android => AndroidKeyboard(
+            controller: controller,
+            backgroundColor: backgroundColor,
+            keyColor: keyColor,
+            keyTextStyle: keyTextStyle,
+            textTheme: textTheme,
+            keyIconColor: keyIconColor,
+          ),
+          KeyboardPlatform.ios18 => Ios18Keyboard(
+            controller: controller,
+            backgroundColor: backgroundColor,
+            keyColor: keyColor,
+            keyTextStyle: keyTextStyle,
+            textTheme: textTheme,
+            keyIconColor: keyIconColor,
+          ),
+          KeyboardPlatform.ios26 => Ios26Keyboard(
+            controller: controller,
+            backgroundColor: backgroundColor,
+            keyColor: keyColor,
+            keyTextStyle: keyTextStyle,
+            textTheme: textTheme,
+            keyIconColor: keyIconColor,
+          ),
         };
       },
     );

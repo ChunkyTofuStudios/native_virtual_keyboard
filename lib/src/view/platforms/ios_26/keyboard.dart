@@ -8,7 +8,15 @@ import 'package:native_virtual_keyboard/src/view/platforms/ios_26/dimensions.dar
 import 'package:native_virtual_keyboard/src/view/platforms/ios_26/theme.dart';
 
 final class Ios26Keyboard extends BaseKeyboard {
-  const Ios26Keyboard({super.key, required super.controller});
+  const Ios26Keyboard({
+    super.key,
+    required super.controller,
+    super.backgroundColor,
+    super.keyColor,
+    super.keyTextStyle,
+    super.textTheme,
+    super.keyIconColor,
+  });
 
   @override
   KeyboardTheme getTheme(Brightness brightness) {

@@ -37,6 +37,19 @@ final class KeyboardKeyTheme {
     required this.pressedBackgroundColor,
     required this.foregroundColor,
   });
+
+  KeyboardKeyTheme copyWith({
+    Color? backgroundColor,
+    Color? pressedBackgroundColor,
+    Color? foregroundColor,
+  }) {
+    return KeyboardKeyTheme(
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      pressedBackgroundColor:
+          pressedBackgroundColor ?? this.pressedBackgroundColor,
+      foregroundColor: foregroundColor ?? this.foregroundColor,
+    );
+  }
 }
 
 final class KeyboardSpecialKeyTheme extends KeyboardKeyTheme {
@@ -52,5 +65,58 @@ final class KeyboardSpecialKeyTheme extends KeyboardKeyTheme {
     required super.foregroundColor,
     required this.pressedOverlayColor,
     required this.pressedFillIcon,
+  });
+
+  // Removed @override since the signature is different (more parameters)
+  // and we are not implementing an interface method strictly here in a polymorphic way for these extra params.
+  KeyboardSpecialKeyTheme copyWith({
+    Color? backgroundColor,
+    Color? pressedBackgroundColor,
+    Color? foregroundColor,
+    Color? pressedOverlayColor,
+    bool? pressedFillIcon,
+  }) {
+    return KeyboardSpecialKeyTheme(
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      pressedBackgroundColor:
+          pressedBackgroundColor ?? this.pressedBackgroundColor,
+      foregroundColor: foregroundColor ?? this.foregroundColor,
+      pressedOverlayColor: pressedOverlayColor ?? this.pressedOverlayColor,
+      pressedFillIcon: pressedFillIcon ?? this.pressedFillIcon,
+    );
+  }
+}
+
+extension KeyboardThemeCopyWith on KeyboardTheme {
+  KeyboardTheme copyWith({
+    Color? backgroundColor,
+    Color? topBorderColor,
+    KeyboardKeyTheme? keyTheme,
+    KeyboardSpecialKeyTheme? specialKeyTheme,
+  }) {
+    return _SimpleKeyboardTheme(
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      topBorderColor: topBorderColor ?? this.topBorderColor,
+      keyTheme: keyTheme ?? this.keyTheme,
+      specialKeyTheme: specialKeyTheme ?? this.specialKeyTheme,
+    );
+  }
+}
+
+class _SimpleKeyboardTheme implements KeyboardTheme {
+  @override
+  final Color backgroundColor;
+  @override
+  final Color? topBorderColor;
+  @override
+  final KeyboardKeyTheme keyTheme;
+  @override
+  final KeyboardSpecialKeyTheme specialKeyTheme;
+
+  const _SimpleKeyboardTheme({
+    required this.backgroundColor,
+    required this.topBorderColor,
+    required this.keyTheme,
+    required this.specialKeyTheme,
   });
 }
