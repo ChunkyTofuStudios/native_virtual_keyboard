@@ -73,7 +73,7 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
         backgroundColor: widget.specialKeyBackgroundColor ?? widget.keyBackgroundColor,
         foregroundColor: widget.keyIconColor,
         shadows: widget.keyShadow, // Apply same shadow to special keys for consistency
-        innerShadows: null, // User requested no inner shadow for special keys
+        innerShadows: null, // We don't apply inner shadow to special keys to match the system UI.
       ),
     );
 
