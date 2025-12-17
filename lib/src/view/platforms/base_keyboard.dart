@@ -322,25 +322,21 @@ class _KeyButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = _backgroundColor();
-    final shadows = _shadows();
-    final innerShadows = _innerShadows();
-    
     return SizedBox(
       width: data.size.width,
       height: data.size.height,
       child: CustomPaint(
-        foregroundPainter: innerShadows != null && innerShadows.isNotEmpty
+        foregroundPainter: _innerShadows() != null && _innerShadows()!.isNotEmpty
             ? _InnerShadowPainter(
-                shadows: innerShadows,
+                shadows: _innerShadows()!,
                 borderRadius: BorderRadius.circular(data.borderRadius),
               )
             : null,
         child: Container(
           decoration: BoxDecoration(
-            color: bgColor,
+            color: _backgroundColor(),
             borderRadius: BorderRadius.circular(data.borderRadius),
-            boxShadow: shadows,
+            boxShadow: _shadows(),
           ),
           child: Center(
             child: _buildKeyContent(context),
