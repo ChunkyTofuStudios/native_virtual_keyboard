@@ -133,15 +133,7 @@ class _MyAppState extends State<MyApp> {
                         fontStyle: FontStyle.italic,
                       )
                     : null,
-                // Example of passing a TextTheme
-                textTheme: _customStyle
-                    ? TextTheme(
-                        bodyLarge: TextStyle(
-                          fontSize: 22, // Changed from 24 to 22
-                          color: Colors.blue.shade900,
-                        ),
-                      )
-                    : null,
+
                 controller: VirtualKeyboardController(
                   layout: EnglishQwertyKeyboardLayout(),
                   onKeyPress: (key) {

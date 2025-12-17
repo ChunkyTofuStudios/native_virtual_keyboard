@@ -37,8 +37,7 @@ class VirtualKeyboard extends StatelessWidget {
   /// The text style of the keys.
   final TextStyle? keyTextStyle;
 
-  /// The text theme to use for the keyboard.
-  final TextTheme? textTheme;
+
 
   /// The color of the icons on the keys.
   final Color? keyIconColor;
@@ -70,7 +69,7 @@ class VirtualKeyboard extends StatelessWidget {
     this.keyIconColor,
     this.specialKeyColor,
     this.keyTextStyle,
-    this.textTheme,
+
     this.showEnter,
     this.showBackspace,
     this.keyShadow,
@@ -93,7 +92,6 @@ class VirtualKeyboard extends StatelessWidget {
             backgroundColor: backgroundColor ?? theme?.backgroundColor,
             keyColor: keyColor ?? theme?.keyColor,
             keyTextStyle: keyTextStyle ?? theme?.keyTextStyle,
-            textTheme: textTheme,
             keyIconColor: keyIconColor ?? theme?.keyIconColor,
             specialKeyColor: specialKeyColor ?? theme?.specialKeyColor,
             showEnter: effectiveShowEnter,
@@ -107,7 +105,7 @@ class VirtualKeyboard extends StatelessWidget {
             backgroundColor: backgroundColor ?? theme?.backgroundColor,
             keyColor: keyColor ?? theme?.keyColor,
             keyTextStyle: keyTextStyle ?? theme?.keyTextStyle,
-            textTheme: textTheme,
+
             keyIconColor: keyIconColor ?? theme?.keyIconColor,
             specialKeyColor: specialKeyColor ?? theme?.specialKeyColor,
             showEnter: effectiveShowEnter,
@@ -121,7 +119,7 @@ class VirtualKeyboard extends StatelessWidget {
             backgroundColor: backgroundColor ?? theme?.backgroundColor,
             keyColor: keyColor ?? theme?.keyColor,
             keyTextStyle: keyTextStyle ?? theme?.keyTextStyle,
-            textTheme: textTheme,
+
             keyIconColor: keyIconColor ?? theme?.keyIconColor,
             specialKeyColor: specialKeyColor ?? theme?.specialKeyColor,
             showEnter: effectiveShowEnter,

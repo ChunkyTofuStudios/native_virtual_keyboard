@@ -22,7 +22,6 @@ abstract class BaseKeyboard extends StatefulWidget {
   final Color? keyIconColor;
   final Color? specialKeyColor;
   final TextStyle? keyTextStyle;
-  final TextTheme? textTheme;
   final bool showEnter;
   final bool showBackspace;
   final List<BoxShadow>? keyShadow;
@@ -37,7 +36,7 @@ abstract class BaseKeyboard extends StatefulWidget {
     this.keyIconColor,
     this.specialKeyColor,
     this.keyTextStyle,
-    this.textTheme,
+
     this.showEnter = true,
     this.showBackspace = true,
     this.keyShadow,
@@ -79,7 +78,7 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
     );
 
     // Calculate effective text style for keys
-    final effectiveTextTheme = widget.textTheme ?? TextTheme.of(context);
+    final effectiveTextTheme = TextTheme.of(context);
     final TextStyle? effectiveKeyTextStyle = widget.keyTextStyle;
     final dimensions = KeyboardDimensions.compute(
       widget.getDimensionsConfig(),
