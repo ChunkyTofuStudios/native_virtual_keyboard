@@ -118,7 +118,7 @@ class _MyAppState extends State<MyApp> {
                 platform: _selectedPlatform,
                 // Custom colors
                 backgroundColor: _customColors ? Colors.red.shade100 : null,
-                keyColor: _customColors ? Colors.yellow.shade200 : null,
+                keyBackgroundColor: _customColors ? Colors.yellow.shade200 : null,
                 specialKeyBackgroundColor: _customColors ? Colors.orange.shade200 : null,
                 keyIconColor: _customColors ? Colors.red : null,
                 

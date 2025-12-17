@@ -32,7 +32,7 @@ class VirtualKeyboard extends StatelessWidget {
   final Color? backgroundColor;
 
   /// The color of the keys.
-  final Color? keyColor;
+  final Color? keyBackgroundColor;
 
   /// The text style of the keys.
   final TextStyle? keyTextStyle;
@@ -65,7 +65,7 @@ class VirtualKeyboard extends StatelessWidget {
     required this.controller,
     this.platform,
     this.backgroundColor,
-    this.keyColor,
+    this.keyBackgroundColor,
     this.keyIconColor,
     this.specialKeyBackgroundColor,
     this.keyTextStyle,
@@ -90,7 +90,7 @@ class VirtualKeyboard extends StatelessWidget {
       VirtualKeyboardPlatform.android => AndroidKeyboard(
             controller: controller,
             backgroundColor: backgroundColor ?? theme?.backgroundColor,
-            keyColor: keyColor ?? theme?.keyColor,
+            keyBackgroundColor: keyBackgroundColor ?? theme?.keyBackgroundColor,
             keyTextStyle: keyTextStyle ?? theme?.keyTextStyle,
             keyIconColor: keyIconColor ?? theme?.keyIconColor,
             specialKeyBackgroundColor: specialKeyBackgroundColor ?? theme?.specialKeyBackgroundColor,
@@ -103,7 +103,7 @@ class VirtualKeyboard extends StatelessWidget {
       VirtualKeyboardPlatform.ios18 => Ios18Keyboard(
             controller: controller,
             backgroundColor: backgroundColor ?? theme?.backgroundColor,
-            keyColor: keyColor ?? theme?.keyColor,
+            keyBackgroundColor: keyBackgroundColor ?? theme?.keyBackgroundColor,
             keyTextStyle: keyTextStyle ?? theme?.keyTextStyle,
 
             keyIconColor: keyIconColor ?? theme?.keyIconColor,
@@ -117,7 +117,7 @@ class VirtualKeyboard extends StatelessWidget {
       VirtualKeyboardPlatform.ios26 => Ios26Keyboard(
             controller: controller,
             backgroundColor: backgroundColor ?? theme?.backgroundColor,
-            keyColor: keyColor ?? theme?.keyColor,
+            keyBackgroundColor: keyBackgroundColor ?? theme?.keyBackgroundColor,
             keyTextStyle: keyTextStyle ?? theme?.keyTextStyle,
 
             keyIconColor: keyIconColor ?? theme?.keyIconColor,

@@ -6,7 +6,7 @@ import 'package:flutter/widgets.dart';
 /// using [VirtualKeyboardTheme.of].
 class VirtualKeyboardThemeData {
   final Color? backgroundColor;
-  final Color? keyColor;
+  final Color? keyBackgroundColor;
   final Color? keyIconColor;
   final Color? specialKeyBackgroundColor;
   final TextStyle? keyTextStyle;
@@ -18,7 +18,7 @@ class VirtualKeyboardThemeData {
 
   const VirtualKeyboardThemeData({
     this.backgroundColor,
-    this.keyColor,
+    this.keyBackgroundColor,
     this.keyIconColor,
     this.specialKeyBackgroundColor,
     this.keyTextStyle,
@@ -32,7 +32,7 @@ class VirtualKeyboardThemeData {
   /// Creates a copy of this object with the given fields replaced with the new values.
   VirtualKeyboardThemeData copyWith({
     Color? backgroundColor,
-    Color? keyColor,
+    Color? keyBackgroundColor,
     Color? keyIconColor,
     Color? specialKeyBackgroundColor,
     TextStyle? keyTextStyle,
@@ -44,7 +44,7 @@ class VirtualKeyboardThemeData {
   }) {
     return VirtualKeyboardThemeData(
       backgroundColor: backgroundColor ?? this.backgroundColor,
-      keyColor: keyColor ?? this.keyColor,
+      keyBackgroundColor: keyBackgroundColor ?? this.keyBackgroundColor,
       keyIconColor: keyIconColor ?? this.keyIconColor,
       specialKeyBackgroundColor:
           specialKeyBackgroundColor ?? this.specialKeyBackgroundColor,
@@ -63,7 +63,7 @@ class VirtualKeyboardThemeData {
     if (other.runtimeType != runtimeType) return false;
     return other is VirtualKeyboardThemeData &&
         other.backgroundColor == backgroundColor &&
-        other.keyColor == keyColor &&
+        other.keyBackgroundColor == keyBackgroundColor &&
         other.keyIconColor == keyIconColor &&
         other.specialKeyBackgroundColor == specialKeyBackgroundColor &&
         other.keyTextStyle == keyTextStyle &&
@@ -77,7 +77,7 @@ class VirtualKeyboardThemeData {
   @override
   int get hashCode => Object.hash(
         backgroundColor,
-        keyColor,
+        keyBackgroundColor,
         keyIconColor,
         specialKeyBackgroundColor,
         keyTextStyle,

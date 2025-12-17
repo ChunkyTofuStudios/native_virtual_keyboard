@@ -18,7 +18,7 @@ typedef OverlayFollowerBuilder =
 abstract class BaseKeyboard extends StatefulWidget {
   final VirtualKeyboardController controller;
   final Color? backgroundColor;
-  final Color? keyColor;
+  final Color? keyBackgroundColor;
   final Color? keyIconColor;
   final Color? specialKeyBackgroundColor;
   final TextStyle? keyTextStyle;
@@ -32,7 +32,7 @@ abstract class BaseKeyboard extends StatefulWidget {
     super.key,
     required this.controller,
     this.backgroundColor,
-    this.keyColor,
+    this.keyBackgroundColor,
     this.keyIconColor,
     this.specialKeyBackgroundColor,
     this.keyTextStyle,
@@ -65,12 +65,12 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
     final theme = defaultTheme.copyWith(
       backgroundColor: widget.backgroundColor,
       keyTheme: defaultTheme.keyTheme.copyWith(
-        backgroundColor: widget.keyColor,
+        backgroundColor: widget.keyBackgroundColor,
         shadows: widget.keyShadow,
         innerShadows: widget.keyInnerShadow,
       ),
       specialKeyTheme: defaultTheme.specialKeyTheme.copyWith(
-        backgroundColor: widget.specialKeyBackgroundColor ?? widget.keyColor,
+        backgroundColor: widget.specialKeyBackgroundColor ?? widget.keyBackgroundColor,
         foregroundColor: widget.keyIconColor,
         shadows: widget.keyShadow, // Apply same shadow to special keys for consistency
         innerShadows: null, // User requested no inner shadow for special keys

@@ -11,7 +11,7 @@ final class AndroidKeyboard extends BaseKeyboard {
     super.key,
     required super.controller,
     super.backgroundColor,
-    super.keyColor,
+    super.keyBackgroundColor,
     super.keyTextStyle,
     super.keyIconColor,
     super.specialKeyBackgroundColor,
