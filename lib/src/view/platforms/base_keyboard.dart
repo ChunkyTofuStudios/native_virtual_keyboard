@@ -339,42 +339,44 @@ class _KeyButton extends StatelessWidget {
             boxShadow: _shadows(),
           ),
           child: Center(
-            child: _buildKeyContent(context),
+            child: data.key.special
+                ? _buildSpecialKeyContent(context)
+                : _buildKeyContent(context),
           ),
         ),
       ),
     );
   }
 
+  Widget _buildSpecialKeyContent(BuildContext context) {
+    return FractionallySizedBox(
+      widthFactor: 0.55,
+      heightFactor: 0.8,
+      child: FittedBox(
+        child: Icon(
+          data.key.icon,
+          fill: isPressed && (data.theme.specialKeyTheme.pressedFillIcon)
+              ? 1
+              : 0,
+          weight: 600,
+          color: _foregroundColor(),
+        ),
+      ),
+    );
+  }
+
   Widget _buildKeyContent(BuildContext context) {
-    if (data.key.special) {
-       return FractionallySizedBox(
-            widthFactor: 0.55,
-            heightFactor: 0.8,
-            child: FittedBox(
-              child: Icon(
-                data.key.icon,
-                fill: isPressed && (data.theme.specialKeyTheme.pressedFillIcon)
-                    ? 1
-                    : 0,
-                weight: 600,
-                color: _foregroundColor(),
-              ),
-            ),
-       );
-    }
-     
-     return AutoSizeText(
-        data.key.text,
-        style: (data.controller.textTheme ??
-                data.keyTextStyle ??
-                data.textTheme?.bodyLarge)
-            ?.copyWith(color: _foregroundColor())
-            .merge(data.keyTextStyle),
-        minFontSize: 4,
-        maxLines: 1,
-        group: data.autoSizeGroup,
-      );
+    return AutoSizeText(
+      data.key.text,
+      style: (data.controller.textTheme ??
+              data.keyTextStyle ??
+              data.textTheme?.bodyLarge)
+          ?.copyWith(color: _foregroundColor())
+          .merge(data.keyTextStyle),
+      minFontSize: 4,
+      maxLines: 1,
+      group: data.autoSizeGroup,
+    );
   }
 }
 
