@@ -354,7 +354,7 @@ class _KeyButton extends StatelessWidget {
             child: FittedBox(
               child: Icon(
                 data.key.icon,
-                fill: isPressed && (data.theme.specialKeyTheme.pressedFillIcon ?? false)
+                fill: isPressed && (data.theme.specialKeyTheme.pressedFillIcon)
                     ? 1
                     : 0,
                 weight: 600,
@@ -365,7 +365,7 @@ class _KeyButton extends StatelessWidget {
     }
      
      return AutoSizeText(
-        data.key.text!,
+        data.key.text,
         style: (data.controller.textTheme ??
                 data.keyTextStyle ??
                 data.textTheme?.bodyLarge)
