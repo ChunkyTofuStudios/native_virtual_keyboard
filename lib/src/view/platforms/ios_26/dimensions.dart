@@ -8,7 +8,7 @@ final class Ios26KeyboardDimensionsConfig extends KeyboardDimensionsConfig {
         keyGapWidthRatio: 18 / 99,
         keyAspectRatio: 99 / 135,
         keyBorderRadiusWidthRatio: 24 / 99,
-        specialKeyWidthMultiplier: 1.5,
+        specialKeyWidthMultiplier: 134 / 99,
         horzToVertSpacingRatio: 18 / 33,
         overlayWidthToWidthRatio: 1070 / 624,
         overlayAspectRatio:

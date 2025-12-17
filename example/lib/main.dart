@@ -13,7 +13,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  KeyboardPlatform? _selectedPlatform;
+  VirtualKeyboardPlatform? _selectedPlatform;
   final _textController = TextEditingController();
 
   // Theming state
@@ -50,17 +50,18 @@ class _MyAppState extends State<MyApp> {
                         children: [
                           const Text('Platform:'),
                           const SizedBox(width: 6),
-                          DropdownButton<KeyboardPlatform?>(
+                          DropdownButton<VirtualKeyboardPlatform?>(
+
                             value: _selectedPlatform,
                             items: [
                               const DropdownMenuItem(
                                 value: null,
                                 child: Text('Auto-detect'),
                               ),
-                              ...KeyboardPlatform.values.map(
-                                (platform) => DropdownMenuItem(
-                                  value: platform,
-                                  child: Text(platform.name),
+                              ...VirtualKeyboardPlatform.values.map(
+                                (e) => DropdownMenuItem(
+                                  value: e,
+                                  child: Text(e.name),
                                 ),
                               ),
                             ],

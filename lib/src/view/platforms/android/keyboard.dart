@@ -20,6 +20,7 @@ final class AndroidKeyboard extends BaseKeyboard {
     super.showBackspace,
     super.keyShadow,
     super.keyInnerShadow,
+    super.specialKeyWidthMultiplier,
   });
 
   @override

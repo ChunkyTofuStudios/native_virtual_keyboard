@@ -26,8 +26,9 @@ final class KeyboardDimensions {
   factory KeyboardDimensions.compute(
     KeyboardDimensionsConfig config,
     double screenWidth,
-    KeyboardLayout layout,
-  ) {
+    KeyboardLayout layout, {
+    double? specialKeyWidthMultiplier,
+  }) {
     final horizontalPadding = screenWidth * (1 - config.keyMaxScreenWidth) / 2;
 
     final keysPerRow = layout.layout.map((row) => row.length).max;
@@ -38,7 +39,9 @@ final class KeyboardDimensions {
     final height = width / config.keyAspectRatio;
     final size = Size(width, height);
 
-    final specialWidth = width * config.specialKeyWidthMultiplier;
+    final effectiveSpecialKeyWidthMultiplier =
+        specialKeyWidthMultiplier ?? config.specialKeyWidthMultiplier;
+    final specialWidth = width * effectiveSpecialKeyWidthMultiplier;
     final specialSize = Size(specialWidth, height);
 
     final borderRadius = width * config.keyBorderRadiusWidthRatio;

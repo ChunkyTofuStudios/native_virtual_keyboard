@@ -22,6 +22,7 @@ final class Ios18Keyboard extends BaseKeyboard {
     super.showBackspace,
     super.keyShadow,
     super.keyInnerShadow,
+    super.specialKeyWidthMultiplier,
   });
 
   @override

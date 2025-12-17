@@ -21,6 +21,7 @@ final class Ios26Keyboard extends BaseKeyboard {
     super.showBackspace,
     super.keyShadow,
     super.keyInnerShadow,
+    super.specialKeyWidthMultiplier,
   });
 
   @override
