@@ -43,7 +43,7 @@ class VirtualKeyboard extends StatelessWidget {
   final Color? keyIconColor;
 
   /// The background color of the special keys.
-  final Color? specialKeyColor;
+  final Color? specialKeyBackgroundColor;
 
   /// Whether to show the enter key.
   final bool? showEnter;
@@ -67,7 +67,7 @@ class VirtualKeyboard extends StatelessWidget {
     this.backgroundColor,
     this.keyColor,
     this.keyIconColor,
-    this.specialKeyColor,
+    this.specialKeyBackgroundColor,
     this.keyTextStyle,
 
     this.showEnter,
@@ -87,13 +87,13 @@ class VirtualKeyboard extends StatelessWidget {
     final effectivePlatform = platform ?? VirtualKeyboardPlatform.autoHelper;
 
     return switch (effectivePlatform) {
-       VirtualKeyboardPlatform.android => AndroidKeyboard(
+      VirtualKeyboardPlatform.android => AndroidKeyboard(
             controller: controller,
             backgroundColor: backgroundColor ?? theme?.backgroundColor,
             keyColor: keyColor ?? theme?.keyColor,
             keyTextStyle: keyTextStyle ?? theme?.keyTextStyle,
             keyIconColor: keyIconColor ?? theme?.keyIconColor,
-            specialKeyColor: specialKeyColor ?? theme?.specialKeyColor,
+            specialKeyBackgroundColor: specialKeyBackgroundColor ?? theme?.specialKeyBackgroundColor,
             showEnter: effectiveShowEnter,
             showBackspace: effectiveShowBackspace,
             keyShadow: keyShadow ?? theme?.keyShadow,
@@ -107,7 +107,7 @@ class VirtualKeyboard extends StatelessWidget {
             keyTextStyle: keyTextStyle ?? theme?.keyTextStyle,
 
             keyIconColor: keyIconColor ?? theme?.keyIconColor,
-            specialKeyColor: specialKeyColor ?? theme?.specialKeyColor,
+            specialKeyBackgroundColor: specialKeyBackgroundColor ?? theme?.specialKeyBackgroundColor,
             showEnter: effectiveShowEnter,
             showBackspace: effectiveShowBackspace,
             keyShadow: keyShadow ?? theme?.keyShadow,
@@ -121,7 +121,7 @@ class VirtualKeyboard extends StatelessWidget {
             keyTextStyle: keyTextStyle ?? theme?.keyTextStyle,
 
             keyIconColor: keyIconColor ?? theme?.keyIconColor,
-            specialKeyColor: specialKeyColor ?? theme?.specialKeyColor,
+            specialKeyBackgroundColor: specialKeyBackgroundColor ?? theme?.specialKeyBackgroundColor,
             showEnter: effectiveShowEnter,
             showBackspace: effectiveShowBackspace,
             keyShadow: keyShadow ?? theme?.keyShadow,

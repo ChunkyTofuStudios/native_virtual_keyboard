@@ -8,7 +8,7 @@ class VirtualKeyboardThemeData {
   final Color? backgroundColor;
   final Color? keyColor;
   final Color? keyIconColor;
-  final Color? specialKeyColor;
+  final Color? specialKeyBackgroundColor;
   final TextStyle? keyTextStyle;
   final bool? showEnter;
   final bool? showBackspace;
@@ -20,7 +20,7 @@ class VirtualKeyboardThemeData {
     this.backgroundColor,
     this.keyColor,
     this.keyIconColor,
-    this.specialKeyColor,
+    this.specialKeyBackgroundColor,
     this.keyTextStyle,
     this.showEnter,
     this.showBackspace,
@@ -34,7 +34,7 @@ class VirtualKeyboardThemeData {
     Color? backgroundColor,
     Color? keyColor,
     Color? keyIconColor,
-    Color? specialKeyColor,
+    Color? specialKeyBackgroundColor,
     TextStyle? keyTextStyle,
     bool? showEnter,
     bool? showBackspace,
@@ -46,7 +46,8 @@ class VirtualKeyboardThemeData {
       backgroundColor: backgroundColor ?? this.backgroundColor,
       keyColor: keyColor ?? this.keyColor,
       keyIconColor: keyIconColor ?? this.keyIconColor,
-      specialKeyColor: specialKeyColor ?? this.specialKeyColor,
+      specialKeyBackgroundColor:
+          specialKeyBackgroundColor ?? this.specialKeyBackgroundColor,
       keyTextStyle: keyTextStyle ?? this.keyTextStyle,
       showEnter: showEnter ?? this.showEnter,
       showBackspace: showBackspace ?? this.showBackspace,
@@ -64,7 +65,7 @@ class VirtualKeyboardThemeData {
         other.backgroundColor == backgroundColor &&
         other.keyColor == keyColor &&
         other.keyIconColor == keyIconColor &&
-        other.specialKeyColor == specialKeyColor &&
+        other.specialKeyBackgroundColor == specialKeyBackgroundColor &&
         other.keyTextStyle == keyTextStyle &&
         other.showEnter == showEnter &&
         other.showBackspace == showBackspace &&
@@ -78,7 +79,7 @@ class VirtualKeyboardThemeData {
         backgroundColor,
         keyColor,
         keyIconColor,
-        specialKeyColor,
+        specialKeyBackgroundColor,
         keyTextStyle,
         showEnter,
         showBackspace,

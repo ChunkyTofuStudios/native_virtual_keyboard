@@ -20,7 +20,7 @@ abstract class BaseKeyboard extends StatefulWidget {
   final Color? backgroundColor;
   final Color? keyColor;
   final Color? keyIconColor;
-  final Color? specialKeyColor;
+  final Color? specialKeyBackgroundColor;
   final TextStyle? keyTextStyle;
   final bool showEnter;
   final bool showBackspace;
@@ -34,7 +34,7 @@ abstract class BaseKeyboard extends StatefulWidget {
     this.backgroundColor,
     this.keyColor,
     this.keyIconColor,
-    this.specialKeyColor,
+    this.specialKeyBackgroundColor,
     this.keyTextStyle,
 
     this.showEnter = true,
@@ -70,7 +70,7 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
         innerShadows: widget.keyInnerShadow,
       ),
       specialKeyTheme: defaultTheme.specialKeyTheme.copyWith(
-        backgroundColor: widget.specialKeyColor ?? widget.keyColor,
+        backgroundColor: widget.specialKeyBackgroundColor ?? widget.keyColor,
         foregroundColor: widget.keyIconColor,
         shadows: widget.keyShadow, // Apply same shadow to special keys for consistency
         innerShadows: null, // User requested no inner shadow for special keys
