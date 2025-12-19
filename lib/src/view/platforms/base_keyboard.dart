@@ -6,7 +6,7 @@ import 'package:native_virtual_keyboard/src/model/virtual_keyboard_key.dart';
 import 'package:native_virtual_keyboard/src/view/keyboard_dimensions.dart';
 import 'package:native_virtual_keyboard/src/view/keyboard_theme.dart';
 import 'package:native_virtual_keyboard/src/view/virtual_keyboard_controller.dart';
-import 'package:native_virtual_keyboard/src/view/virtual_keyboard_theme.dart';
+
 
 typedef OverlayFollowerBuilder =
     CompositedTransformFollower Function(
@@ -84,7 +84,7 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
       widget.getDimensionsConfig(),
       MediaQuery.sizeOf(context).width,
       widget.controller.layout,
-      specialKeyWidthMultiplier: widget.specialKeyWidthMultiplier ?? VirtualKeyboardTheme.of(context)?.specialKeyWidthMultiplier,
+      specialKeyWidthMultiplier: widget.specialKeyWidthMultiplier,
     );
 
 

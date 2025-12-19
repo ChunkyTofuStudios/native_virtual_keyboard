@@ -1,29 +1,21 @@
+import 'dart:io';
+
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
+import 'package:native_virtual_keyboard/src/extensions/ios_version_infos.dart';
+import 'package:native_virtual_keyboard/src/view/keyboard_platform.dart';
 import 'package:native_virtual_keyboard/src/view/platforms/android/keyboard.dart';
 import 'package:native_virtual_keyboard/src/view/platforms/ios_18/keyboard.dart';
 import 'package:native_virtual_keyboard/src/view/platforms/ios_26/keyboard.dart';
 import 'package:native_virtual_keyboard/src/view/virtual_keyboard_controller.dart';
-import 'package:native_virtual_keyboard/src/view/virtual_keyboard_theme.dart';
 
-enum VirtualKeyboardPlatform {
-  android,
-  ios18,
-  ios26;
+final class VirtualKeyboard extends StatelessWidget {
+  static final _log = Logger('VirtualKeyboard');
 
-  static VirtualKeyboardPlatform get autoHelper {
-    final platform = defaultTargetPlatform;
-    return switch (platform) {
-      TargetPlatform.android || TargetPlatform.fuchsia => android,
-      TargetPlatform.iOS || TargetPlatform.macOS => ios26,
-      _ => android,
-    };
-  }
-}
-
-class VirtualKeyboard extends StatelessWidget {
   /// Force a specific platform. If not provided, the platform will be detected automatically.
-  final VirtualKeyboardPlatform? platform;
+  final KeyboardPlatform? platform;
 
   /// The controller for the keyboard.
   final VirtualKeyboardController controller;
@@ -37,8 +29,6 @@ class VirtualKeyboard extends StatelessWidget {
   /// The text style of the keys.
   final TextStyle? keyTextStyle;
 
-
-
   /// The color of the icons on the keys.
   final Color? keyIconColor;
 
@@ -46,17 +36,17 @@ class VirtualKeyboard extends StatelessWidget {
   final Color? specialKeyBackgroundColor;
 
   /// Whether to show the enter key.
-  final bool? showEnter;
+  final bool showEnter;
 
   /// Whether to show the backspace key.
-  final bool? showBackspace;
+  final bool showBackspace;
 
   /// The shadows of the keys.
   final List<BoxShadow>? keyShadow;
 
   /// The inner shadows of the keys.
   final List<BoxShadow>? keyInnerShadow;
-  
+
   /// Multiplier for the width of special keys.
   final double? specialKeyWidthMultiplier;
 
@@ -69,9 +59,8 @@ class VirtualKeyboard extends StatelessWidget {
     this.keyIconColor,
     this.specialKeyBackgroundColor,
     this.keyTextStyle,
-
-    this.showEnter,
-    this.showBackspace,
+    this.showEnter = true,
+    this.showBackspace = true,
     this.keyShadow,
     this.keyInnerShadow,
     this.specialKeyWidthMultiplier,
@@ -79,55 +68,73 @@ class VirtualKeyboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = VirtualKeyboardTheme.of(context);
-    
-    // Resolve values: Widget Param > Theme Param > Null (Default handles later)
-    final effectiveShowEnter = showEnter ?? theme?.showEnter ?? true;
-    final effectiveShowBackspace = showBackspace ?? theme?.showBackspace ?? true;
-    final effectivePlatform = platform ?? VirtualKeyboardPlatform.autoHelper;
+    return FutureBuilder(
+      future: _isIOS && platform == null
+          ? DeviceInfoPlugin().iosInfo
+          : Future.value(null),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const SizedBox.shrink();
+        }
+        final effectivePlatform = _getPlatform(snapshot.data);
+        _log.fine('Platform identified as: ${effectivePlatform.name}');
+        return switch (effectivePlatform) {
+          KeyboardPlatform.android => AndroidKeyboard(
+              controller: controller,
+              backgroundColor: backgroundColor,
+              keyBackgroundColor: keyBackgroundColor,
+              keyTextStyle: keyTextStyle,
+              keyIconColor: keyIconColor,
+              specialKeyBackgroundColor: specialKeyBackgroundColor,
+              showEnter: showEnter,
+              showBackspace: showBackspace,
+              keyShadow: keyShadow,
+              keyInnerShadow: keyInnerShadow,
+              specialKeyWidthMultiplier: specialKeyWidthMultiplier,
+            ),
+          KeyboardPlatform.ios18 => Ios18Keyboard(
+              controller: controller,
+              backgroundColor: backgroundColor,
+              keyBackgroundColor: keyBackgroundColor,
+              keyTextStyle: keyTextStyle,
+              keyIconColor: keyIconColor,
+              specialKeyBackgroundColor: specialKeyBackgroundColor,
+              showEnter: showEnter,
+              showBackspace: showBackspace,
+              keyShadow: keyShadow,
+              keyInnerShadow: keyInnerShadow,
+              specialKeyWidthMultiplier: specialKeyWidthMultiplier,
+            ),
+          KeyboardPlatform.ios26 => Ios26Keyboard(
+              controller: controller,
+              backgroundColor: backgroundColor,
+              keyBackgroundColor: keyBackgroundColor,
+              keyTextStyle: keyTextStyle,
+              keyIconColor: keyIconColor,
+              specialKeyBackgroundColor: specialKeyBackgroundColor,
+              showEnter: showEnter,
+              showBackspace: showBackspace,
+              keyShadow: keyShadow,
+              keyInnerShadow: keyInnerShadow,
+              specialKeyWidthMultiplier: specialKeyWidthMultiplier,
+            ),
+        };
+      },
+    );
+  }
 
-    return switch (effectivePlatform) {
-      VirtualKeyboardPlatform.android => AndroidKeyboard(
-            controller: controller,
-            backgroundColor: backgroundColor ?? theme?.backgroundColor,
-            keyBackgroundColor: keyBackgroundColor ?? theme?.keyBackgroundColor,
-            keyTextStyle: keyTextStyle ?? theme?.keyTextStyle,
-            keyIconColor: keyIconColor ?? theme?.keyIconColor,
-            specialKeyBackgroundColor: specialKeyBackgroundColor ?? theme?.specialKeyBackgroundColor,
-            showEnter: effectiveShowEnter,
-            showBackspace: effectiveShowBackspace,
-            keyShadow: keyShadow ?? theme?.keyShadow,
-            keyInnerShadow: keyInnerShadow ?? theme?.keyInnerShadow,
-            specialKeyWidthMultiplier: specialKeyWidthMultiplier ?? theme?.specialKeyWidthMultiplier,
-          ),
-      VirtualKeyboardPlatform.ios18 => Ios18Keyboard(
-            controller: controller,
-            backgroundColor: backgroundColor ?? theme?.backgroundColor,
-            keyBackgroundColor: keyBackgroundColor ?? theme?.keyBackgroundColor,
-            keyTextStyle: keyTextStyle ?? theme?.keyTextStyle,
+  bool get _isIOS => !kIsWeb && Platform.isIOS;
 
-            keyIconColor: keyIconColor ?? theme?.keyIconColor,
-            specialKeyBackgroundColor: specialKeyBackgroundColor ?? theme?.specialKeyBackgroundColor,
-            showEnter: effectiveShowEnter,
-            showBackspace: effectiveShowBackspace,
-            keyShadow: keyShadow ?? theme?.keyShadow,
-            keyInnerShadow: keyInnerShadow ?? theme?.keyInnerShadow,
-            specialKeyWidthMultiplier: specialKeyWidthMultiplier ?? theme?.specialKeyWidthMultiplier,
-          ),
-      VirtualKeyboardPlatform.ios26 => Ios26Keyboard(
-            controller: controller,
-            backgroundColor: backgroundColor ?? theme?.backgroundColor,
-            keyBackgroundColor: keyBackgroundColor ?? theme?.keyBackgroundColor,
-            keyTextStyle: keyTextStyle ?? theme?.keyTextStyle,
-
-            keyIconColor: keyIconColor ?? theme?.keyIconColor,
-            specialKeyBackgroundColor: specialKeyBackgroundColor ?? theme?.specialKeyBackgroundColor,
-            showEnter: effectiveShowEnter,
-            showBackspace: effectiveShowBackspace,
-            keyShadow: keyShadow ?? theme?.keyShadow,
-            keyInnerShadow: keyInnerShadow ?? theme?.keyInnerShadow,
-            specialKeyWidthMultiplier: specialKeyWidthMultiplier ?? theme?.specialKeyWidthMultiplier,
-          ),
-    };
+  KeyboardPlatform _getPlatform(IosDeviceInfo? iosDeviceInfo) {
+    final override = platform;
+    if (override != null) {
+      return override;
+    }
+    if (iosDeviceInfo != null) {
+      return iosDeviceInfo.isIos26
+          ? KeyboardPlatform.ios26
+          : KeyboardPlatform.ios18;
+    }
+    return KeyboardPlatform.android;
   }
 }
