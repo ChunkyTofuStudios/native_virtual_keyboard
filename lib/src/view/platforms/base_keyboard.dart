@@ -122,12 +122,10 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
                   for (final (index, key) in row.indexed) ...[
                     if (key.special && index > 0) const Spacer(),
                     Visibility(
-                      visible: (key == VirtualKeyboardKey.enter &&
+                      visible: !((key == VirtualKeyboardKey.enter &&
                               !widget.showEnter) ||
                           (key == VirtualKeyboardKey.backspace &&
-                              !widget.showBackspace)
-                          ? false
-                          : true,
+                              !widget.showBackspace)),
                       maintainSize: true,
                       maintainAnimation: true,
                       maintainState: true,
