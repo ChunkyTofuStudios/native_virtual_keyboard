@@ -20,6 +20,14 @@ abstract class KeyboardTheme {
     required this.keyTheme,
     required this.specialKeyTheme,
   });
+
+  /// Creates a copy of this theme with the given fields replaced.
+  KeyboardTheme copyWith({
+    Color? backgroundColor,
+    Color? topBorderColor,
+    KeyboardKeyTheme? keyTheme,
+    KeyboardSpecialKeyTheme? specialKeyTheme,
+  });
 }
 
 final class KeyboardKeyTheme {
@@ -102,38 +110,4 @@ final class KeyboardSpecialKeyTheme extends KeyboardKeyTheme {
       pressedFillIcon: pressedFillIcon ?? this.pressedFillIcon,
     );
   }
-}
-
-extension KeyboardThemeCopyWith on KeyboardTheme {
-  KeyboardTheme copyWith({
-    Color? backgroundColor,
-    Color? topBorderColor,
-    KeyboardKeyTheme? keyTheme,
-    KeyboardSpecialKeyTheme? specialKeyTheme,
-  }) {
-    return _SimpleKeyboardTheme(
-      backgroundColor: backgroundColor ?? this.backgroundColor,
-      topBorderColor: topBorderColor ?? this.topBorderColor,
-      keyTheme: keyTheme ?? this.keyTheme,
-      specialKeyTheme: specialKeyTheme ?? this.specialKeyTheme,
-    );
-  }
-}
-
-class _SimpleKeyboardTheme implements KeyboardTheme {
-  @override
-  final Color backgroundColor;
-  @override
-  final Color? topBorderColor;
-  @override
-  final KeyboardKeyTheme keyTheme;
-  @override
-  final KeyboardSpecialKeyTheme specialKeyTheme;
-
-  const _SimpleKeyboardTheme({
-    required this.backgroundColor,
-    required this.topBorderColor,
-    required this.keyTheme,
-    required this.specialKeyTheme,
-  });
 }

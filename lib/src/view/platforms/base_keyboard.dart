@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:native_virtual_keyboard/src/model/virtual_keyboard_key.dart';
+import 'package:native_virtual_keyboard/src/view/inner_shadow_painter.dart';
 import 'package:native_virtual_keyboard/src/view/keyboard_dimensions.dart';
 import 'package:native_virtual_keyboard/src/view/keyboard_theme.dart';
 import 'package:native_virtual_keyboard/src/view/virtual_keyboard_controller.dart';
@@ -78,7 +79,6 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
     );
 
     // Calculate effective text style for keys
-    final effectiveTextTheme = TextTheme.of(context);
     final TextStyle? effectiveKeyTextStyle = widget.keyTextStyle;
     final dimensions = KeyboardDimensions.compute(
       widget.getDimensionsConfig(),
@@ -149,7 +149,6 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
                           overlayFollowerBuilder: widget.overlayFollowerBuilder(),
                           controller: widget.controller,
                           keyTextStyle: effectiveKeyTextStyle,
-                          textTheme: effectiveTextTheme,
                         ),
                       ),
                     ),
@@ -177,7 +176,6 @@ final class KeyParams {
   final OverlayFollowerBuilder overlayFollowerBuilder;
   final VirtualKeyboardController controller;
   final TextStyle? keyTextStyle;
-  final TextTheme? textTheme;
 
   const KeyParams({
     required this.key,
@@ -190,8 +188,7 @@ final class KeyParams {
     required this.autoSizeGroup,
     required this.overlayFollowerBuilder,
     required this.controller,
-    this.keyTextStyle,
-    this.textTheme,
+    required this.keyTextStyle,
   });
 }
 
@@ -320,13 +317,14 @@ class _KeyButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final innerShadows = _innerShadows();
     return SizedBox(
       width: data.size.width,
       height: data.size.height,
       child: CustomPaint(
-        foregroundPainter: _innerShadows() != null && _innerShadows()!.isNotEmpty
-            ? _InnerShadowPainter(
-                shadows: _innerShadows()!,
+        foregroundPainter: innerShadows != null && innerShadows.isNotEmpty
+            ? InnerShadowPainter(
+                shadows: innerShadows,
                 borderRadius: BorderRadius.circular(data.borderRadius),
               )
             : null,
@@ -366,9 +364,7 @@ class _KeyButton extends StatelessWidget {
   Widget _buildKeyContent(BuildContext context) {
     return AutoSizeText(
       data.key.text,
-      style: (data.controller.textTheme ??
-              data.keyTextStyle ??
-              data.textTheme?.bodyLarge)
+      style: (data.controller.textTheme ?? data.keyTextStyle)
           ?.copyWith(color: _foregroundColor())
           .merge(data.keyTextStyle),
       minFontSize: 4,
@@ -376,41 +372,4 @@ class _KeyButton extends StatelessWidget {
       group: data.autoSizeGroup,
     );
   }
-}
-
-class _InnerShadowPainter extends CustomPainter {
-  final List<BoxShadow> shadows;
-  final BorderRadius borderRadius;
-
-  _InnerShadowPainter({required this.shadows, required this.borderRadius});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final rect = Offset.zero & size;
-    final rrect = borderRadius.toRRect(rect);
-
-    canvas.clipRRect(rrect);
-
-    for (final shadow in shadows) {
-      final paint = shadow.toPaint();
-      final spread = shadow.spreadRadius;
-      final blur = shadow.blurRadius;
-      final offset = shadow.offset;
-
-      canvas.save();
-       
-      final holePath = Path()
-        ..fillType = PathFillType.evenOdd
-        ..addRect(rect.inflate(blur * 2 + spread + 10.0))
-        ..addRRect(rrect.shift(offset)); 
-      
-      canvas.drawPath(holePath, paint);
-      canvas.restore();
-    }
-  }
-
-  @override
-  bool shouldRepaint(_InnerShadowPainter oldDelegate) =>
-      oldDelegate.shadows != shadows ||
-      oldDelegate.borderRadius != borderRadius;
 }
