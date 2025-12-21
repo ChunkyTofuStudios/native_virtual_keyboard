@@ -1,3 +1,7 @@
+## 0.2.0
+
+* Allow configuring keyboard style including color, shadows, and keys by [bariskodas](https://github.com/bariskodas)
+
 ## 0.1.2
 
 * Improve iOS 26 overlay shape accuracy

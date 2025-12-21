@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class InnerShadowPainter extends CustomPainter {
@@ -20,12 +21,12 @@ class InnerShadowPainter extends CustomPainter {
       final offset = shadow.offset;
 
       canvas.save();
-       
+
       final holePath = Path()
         ..fillType = PathFillType.evenOdd
         ..addRect(rect.inflate(blur * 2 + spread + 10.0))
-        ..addRRect(rrect.shift(offset)); 
-      
+        ..addRRect(rrect.shift(offset));
+
       canvas.drawPath(holePath, paint);
       canvas.restore();
     }
@@ -33,6 +34,6 @@ class InnerShadowPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(InnerShadowPainter oldDelegate) =>
-      oldDelegate.shadows != shadows ||
+      !listEquals(oldDelegate.shadows, shadows) ||
       oldDelegate.borderRadius != borderRadius;
 }

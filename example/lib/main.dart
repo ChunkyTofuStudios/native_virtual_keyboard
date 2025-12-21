@@ -51,7 +51,6 @@ class _MyAppState extends State<MyApp> {
                           const Text('Platform:'),
                           const SizedBox(width: 6),
                           DropdownButton<KeyboardPlatform?>(
-
                             value: _selectedPlatform,
                             items: [
                               const DropdownMenuItem(
@@ -72,30 +71,30 @@ class _MyAppState extends State<MyApp> {
                       ),
                       const SizedBox(height: 16),
                       // Theme Controls
-            SwitchListTile(
-              title: const Text('Custom Colors (Red/Yellow/Orange)'),
-              value: _customColors,
-              onChanged: (value) {
-                setState(() {
-                  _customColors = value;
-                });
-              },
-            ),
-            SwitchListTile(
-              title: const Text('Custom Font (Serif/Bold)'),
-              value: _customStyle,
-              onChanged: (v) => setState(() => _customStyle = v),
-            ),
-            SwitchListTile(
-              title: const Text('Show Enter Key'),
-              value: _showEnter,
-              onChanged: (v) => setState(() => _showEnter = v),
-            ),
-            SwitchListTile(
-              title: const Text('Show Backspace Key'),
-              value: _showBackspace,
-              onChanged: (v) => setState(() => _showBackspace = v),
-            ),
+                      SwitchListTile(
+                        title: const Text('Custom Colors (Red/Yellow/Orange)'),
+                        value: _customColors,
+                        onChanged: (value) {
+                          setState(() {
+                            _customColors = value;
+                          });
+                        },
+                      ),
+                      SwitchListTile(
+                        title: const Text('Custom Font (Serif/Bold)'),
+                        value: _customStyle,
+                        onChanged: (v) => setState(() => _customStyle = v),
+                      ),
+                      SwitchListTile(
+                        title: const Text('Show Enter Key'),
+                        value: _showEnter,
+                        onChanged: (v) => setState(() => _showEnter = v),
+                      ),
+                      SwitchListTile(
+                        title: const Text('Show Backspace Key'),
+                        value: _showBackspace,
+                        onChanged: (v) => setState(() => _showBackspace = v),
+                      ),
                       const SizedBox(height: 16),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 22),
@@ -118,10 +117,14 @@ class _MyAppState extends State<MyApp> {
                 platform: _selectedPlatform,
                 // Custom colors
                 backgroundColor: _customColors ? Colors.red.shade100 : null,
-                keyBackgroundColor: _customColors ? Colors.yellow.shade200 : null,
-                specialKeyBackgroundColor: _customColors ? Colors.orange.shade200 : null,
+                keyBackgroundColor: _customColors
+                    ? Colors.yellow.shade200
+                    : null,
+                specialKeyBackgroundColor: _customColors
+                    ? Colors.orange.shade200
+                    : null,
                 keyIconColor: _customColors ? Colors.red : null,
-                
+
                 showEnter: _showEnter,
                 showBackspace: _showBackspace,
                 // Custom Styles

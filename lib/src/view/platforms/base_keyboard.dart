@@ -8,7 +8,6 @@ import 'package:native_virtual_keyboard/src/view/keyboard_dimensions.dart';
 import 'package:native_virtual_keyboard/src/view/keyboard_theme.dart';
 import 'package:native_virtual_keyboard/src/view/virtual_keyboard_controller.dart';
 
-
 typedef OverlayFollowerBuilder =
     CompositedTransformFollower Function(
       BuildContext context,
@@ -60,8 +59,9 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
 
   @override
   Widget build(BuildContext context) {
-    final defaultTheme =
-        widget.getTheme(MediaQuery.platformBrightnessOf(context));
+    final defaultTheme = widget.getTheme(
+      MediaQuery.platformBrightnessOf(context),
+    );
     // Apply overrides
     final theme = defaultTheme.copyWith(
       backgroundColor: widget.backgroundColor,
@@ -73,8 +73,10 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
       specialKeyTheme: defaultTheme.specialKeyTheme.copyWith(
         backgroundColor: widget.specialKeyBackgroundColor,
         foregroundColor: widget.keyIconColor,
-        shadows: widget.keyShadow, // Apply same shadow to special keys for consistency
-        innerShadows: null, // We don't apply inner shadow to special keys to match the system UI.
+        shadows: widget
+            .keyShadow, // Apply same shadow to special keys for consistency
+        innerShadows:
+            null, // We don't apply inner shadow to special keys to match the system UI.
       ),
     );
 
@@ -86,7 +88,6 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
       widget.controller.layout,
       specialKeyWidthMultiplier: widget.specialKeyWidthMultiplier,
     );
-
 
     return Container(
       decoration: BoxDecoration(
@@ -122,10 +123,11 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
                   for (final (index, key) in row.indexed) ...[
                     if (key.special && index > 0) const Spacer(),
                     Visibility(
-                      visible: !((key == VirtualKeyboardKey.enter &&
-                              !widget.showEnter) ||
-                          (key == VirtualKeyboardKey.backspace &&
-                              !widget.showBackspace)),
+                      visible:
+                          !((key == VirtualKeyboardKey.enter &&
+                                  !widget.showEnter) ||
+                              (key == VirtualKeyboardKey.backspace &&
+                                  !widget.showBackspace)),
                       maintainSize: true,
                       maintainAnimation: true,
                       maintainState: true,
@@ -146,7 +148,8 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
                           ),
                           theme: theme,
                           autoSizeGroup: _autoSizeGroup,
-                          overlayFollowerBuilder: widget.overlayFollowerBuilder(),
+                          overlayFollowerBuilder: widget
+                              .overlayFollowerBuilder(),
                           controller: widget.controller,
                           keyTextStyle: effectiveKeyTextStyle,
                         ),
