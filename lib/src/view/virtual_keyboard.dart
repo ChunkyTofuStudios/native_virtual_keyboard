@@ -20,7 +20,51 @@ final class VirtualKeyboard extends StatelessWidget {
   /// The controller for the keyboard.
   final VirtualKeyboardController controller;
 
-  const VirtualKeyboard({super.key, this.platform, required this.controller});
+  /// The background color of the keyboard.
+  final Color? backgroundColor;
+
+  /// The color of the keys.
+  final Color? keyBackgroundColor;
+
+  /// The text style of the keys.
+  final TextStyle? keyTextStyle;
+
+  /// The color of the icons on the keys.
+  final Color? keyIconColor;
+
+  /// The background color of the special keys.
+  final Color? specialKeyBackgroundColor;
+
+  /// Whether to show the enter key.
+  final bool showEnter;
+
+  /// Whether to show the backspace key.
+  final bool showBackspace;
+
+  /// The shadows of the keys.
+  final List<BoxShadow>? keyShadow;
+
+  /// The inner shadows of the keys.
+  final List<BoxShadow>? keyInnerShadow;
+
+  /// Multiplier for the width of special keys.
+  final double? specialKeyWidthMultiplier;
+
+  const VirtualKeyboard({
+    super.key,
+    required this.controller,
+    this.platform,
+    this.backgroundColor,
+    this.keyBackgroundColor,
+    this.keyIconColor,
+    this.specialKeyBackgroundColor,
+    this.keyTextStyle,
+    this.showEnter = true,
+    this.showBackspace = true,
+    this.keyShadow,
+    this.keyInnerShadow,
+    this.specialKeyWidthMultiplier,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -32,12 +76,48 @@ final class VirtualKeyboard extends StatelessWidget {
         if (snapshot.connectionState != ConnectionState.done) {
           return const SizedBox.shrink();
         }
-        final platform = _getPlatform(snapshot.data);
-        _log.fine('Platform identified as: ${platform.name}');
-        return switch (platform) {
-          KeyboardPlatform.android => AndroidKeyboard(controller: controller),
-          KeyboardPlatform.ios18 => Ios18Keyboard(controller: controller),
-          KeyboardPlatform.ios26 => Ios26Keyboard(controller: controller),
+        final effectivePlatform = _getPlatform(snapshot.data);
+        _log.fine('Platform identified as: ${effectivePlatform.name}');
+        return switch (effectivePlatform) {
+          KeyboardPlatform.android => AndroidKeyboard(
+              controller: controller,
+              backgroundColor: backgroundColor,
+              keyBackgroundColor: keyBackgroundColor,
+              keyTextStyle: keyTextStyle,
+              keyIconColor: keyIconColor,
+              specialKeyBackgroundColor: specialKeyBackgroundColor,
+              showEnter: showEnter,
+              showBackspace: showBackspace,
+              keyShadow: keyShadow,
+              keyInnerShadow: keyInnerShadow,
+              specialKeyWidthMultiplier: specialKeyWidthMultiplier,
+            ),
+          KeyboardPlatform.ios18 => Ios18Keyboard(
+              controller: controller,
+              backgroundColor: backgroundColor,
+              keyBackgroundColor: keyBackgroundColor,
+              keyTextStyle: keyTextStyle,
+              keyIconColor: keyIconColor,
+              specialKeyBackgroundColor: specialKeyBackgroundColor,
+              showEnter: showEnter,
+              showBackspace: showBackspace,
+              keyShadow: keyShadow,
+              keyInnerShadow: keyInnerShadow,
+              specialKeyWidthMultiplier: specialKeyWidthMultiplier,
+            ),
+          KeyboardPlatform.ios26 => Ios26Keyboard(
+              controller: controller,
+              backgroundColor: backgroundColor,
+              keyBackgroundColor: keyBackgroundColor,
+              keyTextStyle: keyTextStyle,
+              keyIconColor: keyIconColor,
+              specialKeyBackgroundColor: specialKeyBackgroundColor,
+              showEnter: showEnter,
+              showBackspace: showBackspace,
+              keyShadow: keyShadow,
+              keyInnerShadow: keyInnerShadow,
+              specialKeyWidthMultiplier: specialKeyWidthMultiplier,
+            ),
         };
       },
     );

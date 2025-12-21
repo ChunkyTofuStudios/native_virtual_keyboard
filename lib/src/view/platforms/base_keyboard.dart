@@ -3,9 +3,11 @@ import 'dart:math';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:native_virtual_keyboard/src/model/virtual_keyboard_key.dart';
+import 'package:native_virtual_keyboard/src/view/inner_shadow_painter.dart';
 import 'package:native_virtual_keyboard/src/view/keyboard_dimensions.dart';
 import 'package:native_virtual_keyboard/src/view/keyboard_theme.dart';
 import 'package:native_virtual_keyboard/src/view/virtual_keyboard_controller.dart';
+
 
 typedef OverlayFollowerBuilder =
     CompositedTransformFollower Function(
@@ -16,8 +18,32 @@ typedef OverlayFollowerBuilder =
 
 abstract class BaseKeyboard extends StatefulWidget {
   final VirtualKeyboardController controller;
+  final Color? backgroundColor;
+  final Color? keyBackgroundColor;
+  final Color? keyIconColor;
+  final Color? specialKeyBackgroundColor;
+  final TextStyle? keyTextStyle;
+  final bool showEnter;
+  final bool showBackspace;
+  final List<BoxShadow>? keyShadow;
+  final List<BoxShadow>? keyInnerShadow;
+  final double? specialKeyWidthMultiplier;
 
-  const BaseKeyboard({super.key, required this.controller});
+  const BaseKeyboard({
+    super.key,
+    required this.controller,
+    this.backgroundColor,
+    this.keyBackgroundColor,
+    this.keyIconColor,
+    this.specialKeyBackgroundColor,
+    this.keyTextStyle,
+
+    this.showEnter = true,
+    this.showBackspace = true,
+    this.keyShadow,
+    this.keyInnerShadow,
+    this.specialKeyWidthMultiplier,
+  });
 
   KeyboardTheme getTheme(Brightness brightness);
 
@@ -34,12 +60,33 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = widget.getTheme(MediaQuery.platformBrightnessOf(context));
+    final defaultTheme =
+        widget.getTheme(MediaQuery.platformBrightnessOf(context));
+    // Apply overrides
+    final theme = defaultTheme.copyWith(
+      backgroundColor: widget.backgroundColor,
+      keyTheme: defaultTheme.keyTheme.copyWith(
+        backgroundColor: widget.keyBackgroundColor,
+        shadows: widget.keyShadow,
+        innerShadows: widget.keyInnerShadow,
+      ),
+      specialKeyTheme: defaultTheme.specialKeyTheme.copyWith(
+        backgroundColor: widget.specialKeyBackgroundColor,
+        foregroundColor: widget.keyIconColor,
+        shadows: widget.keyShadow, // Apply same shadow to special keys for consistency
+        innerShadows: null, // We don't apply inner shadow to special keys to match the system UI.
+      ),
+    );
+
+    // Calculate effective text style for keys
+    final TextStyle? effectiveKeyTextStyle = widget.keyTextStyle;
     final dimensions = KeyboardDimensions.compute(
       widget.getDimensionsConfig(),
       MediaQuery.sizeOf(context).width,
       widget.controller.layout,
+      specialKeyWidthMultiplier: widget.specialKeyWidthMultiplier,
     );
+
 
     return Container(
       decoration: BoxDecoration(
@@ -74,25 +121,35 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
                 children: [
                   for (final (index, key) in row.indexed) ...[
                     if (key.special && index > 0) const Spacer(),
-                    _Key(
-                      data: KeyParams(
-                        key: key,
-                        size: key.special
-                            ? dimensions.keyDimensions.specialSize
-                            : dimensions.keyDimensions.size,
-                        borderRadius: dimensions.keyDimensions.borderRadius,
-                        elevation: dimensions.keyDimensions.elevation,
-                        overlaySize: dimensions.keyDimensions.overlaySize,
-                        padding: EdgeInsets.symmetric(
-                          horizontal:
-                              dimensions.keyDimensions.horizontalSpacing / 2,
-                          vertical:
-                              dimensions.keyDimensions.verticalSpacing / 2,
+                    Visibility(
+                      visible: !((key == VirtualKeyboardKey.enter &&
+                              !widget.showEnter) ||
+                          (key == VirtualKeyboardKey.backspace &&
+                              !widget.showBackspace)),
+                      maintainSize: true,
+                      maintainAnimation: true,
+                      maintainState: true,
+                      child: _Key(
+                        data: KeyParams(
+                          key: key,
+                          size: key.special
+                              ? dimensions.keyDimensions.specialSize
+                              : dimensions.keyDimensions.size,
+                          borderRadius: dimensions.keyDimensions.borderRadius,
+                          elevation: dimensions.keyDimensions.elevation,
+                          overlaySize: dimensions.keyDimensions.overlaySize,
+                          padding: EdgeInsets.symmetric(
+                            horizontal:
+                                dimensions.keyDimensions.horizontalSpacing / 2,
+                            vertical:
+                                dimensions.keyDimensions.verticalSpacing / 2,
+                          ),
+                          theme: theme,
+                          autoSizeGroup: _autoSizeGroup,
+                          overlayFollowerBuilder: widget.overlayFollowerBuilder(),
+                          controller: widget.controller,
+                          keyTextStyle: effectiveKeyTextStyle,
                         ),
-                        theme: theme,
-                        autoSizeGroup: _autoSizeGroup,
-                        overlayFollowerBuilder: widget.overlayFollowerBuilder(),
-                        controller: widget.controller,
                       ),
                     ),
                     if (key.special && index < row.length - 1) const Spacer(),
@@ -118,6 +175,7 @@ final class KeyParams {
   final AutoSizeGroup autoSizeGroup;
   final OverlayFollowerBuilder overlayFollowerBuilder;
   final VirtualKeyboardController controller;
+  final TextStyle? keyTextStyle;
 
   const KeyParams({
     required this.key,
@@ -130,6 +188,7 @@ final class KeyParams {
     required this.autoSizeGroup,
     required this.overlayFollowerBuilder,
     required this.controller,
+    required this.keyTextStyle,
   });
 }
 
@@ -248,53 +307,69 @@ class _KeyButton extends StatelessWidget {
       ? data.theme.specialKeyTheme.foregroundColor
       : data.theme.keyTheme.foregroundColor;
 
+  List<BoxShadow>? _shadows() => data.key.special
+      ? data.theme.specialKeyTheme.shadows
+      : data.theme.keyTheme.shadows;
+
+  List<BoxShadow>? _innerShadows() => data.key.special
+      ? data.theme.specialKeyTheme.innerShadows
+      : data.theme.keyTheme.innerShadows;
+
   @override
   Widget build(BuildContext context) {
+    final innerShadows = _innerShadows();
     return SizedBox(
       width: data.size.width,
       height: data.size.height,
-      child: Card(
-        margin: EdgeInsets.zero,
-        elevation: data.elevation,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(data.borderRadius),
-        ),
+      child: CustomPaint(
+        foregroundPainter: innerShadows != null && innerShadows.isNotEmpty
+            ? InnerShadowPainter(
+                shadows: innerShadows,
+                borderRadius: BorderRadius.circular(data.borderRadius),
+              )
+            : null,
         child: Container(
           decoration: BoxDecoration(
             color: _backgroundColor(),
             borderRadius: BorderRadius.circular(data.borderRadius),
+            boxShadow: _shadows(),
           ),
           child: Center(
             child: data.key.special
-                ? FractionallySizedBox(
-                    widthFactor: 0.55,
-                    heightFactor: 0.8,
-                    child: FittedBox(
-                      child: Icon(
-                        data.key.icon,
-                        fill:
-                            isPressed &&
-                                data.theme.specialKeyTheme.pressedFillIcon
-                            ? 1
-                            : 0,
-                        weight: 600,
-                        color: _foregroundColor(),
-                      ),
-                    ),
-                  )
-                : AutoSizeText(
-                    data.key.text,
-                    style:
-                        (data.controller.textTheme ??
-                                TextTheme.of(context).bodyLarge)
-                            ?.copyWith(color: _foregroundColor()),
-                    minFontSize: 4,
-                    maxLines: 1,
-                    group: data.autoSizeGroup,
-                  ),
+                ? _buildSpecialKeyContent(context)
+                : _buildKeyContent(context),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildSpecialKeyContent(BuildContext context) {
+    return FractionallySizedBox(
+      widthFactor: 0.55,
+      heightFactor: 0.8,
+      child: FittedBox(
+        child: Icon(
+          data.key.icon,
+          fill: isPressed && (data.theme.specialKeyTheme.pressedFillIcon)
+              ? 1
+              : 0,
+          weight: 600,
+          color: _foregroundColor(),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildKeyContent(BuildContext context) {
+    return AutoSizeText(
+      data.key.text,
+      style: (data.controller.textTheme ?? data.keyTextStyle)
+          ?.copyWith(color: _foregroundColor())
+          .merge(data.keyTextStyle),
+      minFontSize: 4,
+      maxLines: 1,
+      group: data.autoSizeGroup,
     );
   }
 }
