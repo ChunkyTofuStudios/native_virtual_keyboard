@@ -1,3 +1,7 @@
+## 0.2.1
+
+* Allow customizing overlay colors
+
 ## 0.2.0
 
 * Allow configuring keyboard style including color, shadows, and keys by [bariskodas](https://github.com/bariskodas)
