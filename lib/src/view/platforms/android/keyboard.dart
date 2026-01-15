@@ -58,7 +58,9 @@ class _KeyPressOverlay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: params.overlayBackgroundColor ?? params.theme.keyTheme.backgroundColor,
+      color:
+          params.overlayBackgroundColor ??
+          params.theme.keyTheme.backgroundColor,
       shape: const CircleBorder(),
       elevation: 2,
       margin: EdgeInsets.zero,
@@ -71,7 +73,8 @@ class _KeyPressOverlay extends StatelessWidget {
           child: AutoSizeText(
             params.key.text,
             style: TextStyle(
-              color: params.overlayTextColor ??
+              color:
+                  params.overlayTextColor ??
                   params.theme.keyTheme.foregroundColor,
               fontSize: 32,
             ).merge(params.controller.overlayTextTheme),

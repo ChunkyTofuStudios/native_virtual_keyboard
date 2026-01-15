@@ -82,7 +82,8 @@ class _KeyPressOverlay extends StatelessWidget {
               child: AutoSizeText(
                 params.key.text,
                 style: TextStyle(
-                  color: params.overlayTextColor ??
+                  color:
+                      params.overlayTextColor ??
                       params.theme.keyTheme.foregroundColor,
                   fontSize: 32,
                 ).merge(params.controller.overlayTextTheme),
