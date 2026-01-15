@@ -20,6 +20,8 @@ final class AndroidKeyboard extends BaseKeyboard {
     super.keyShadow,
     super.keyInnerShadow,
     super.specialKeyWidthMultiplier,
+    super.overlayBackgroundColor,
+    super.overlayTextColor,
   });
 
   @override
@@ -56,7 +58,7 @@ class _KeyPressOverlay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: params.theme.keyTheme.backgroundColor,
+      color: params.overlayBackgroundColor ?? params.theme.keyTheme.backgroundColor,
       shape: const CircleBorder(),
       elevation: 2,
       margin: EdgeInsets.zero,
@@ -68,13 +70,11 @@ class _KeyPressOverlay extends StatelessWidget {
         child: Center(
           child: AutoSizeText(
             params.key.text,
-            style:
-                (params.controller.overlayTextTheme ??
-                        TextTheme.of(context).bodyLarge)
-                    ?.copyWith(
-                      color: params.theme.keyTheme.foregroundColor,
-                      fontSize: 32,
-                    ),
+            style: TextStyle(
+              color: params.overlayTextColor ??
+                  params.theme.keyTheme.foregroundColor,
+              fontSize: 32,
+            ).merge(params.controller.overlayTextTheme),
             maxLines: 1,
             minFontSize: 4,
             textAlign: TextAlign.center,

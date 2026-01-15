@@ -19,6 +19,7 @@ class _MyAppState extends State<MyApp> {
   // Theming state
   bool _customColors = false;
   bool _customStyle = false;
+  bool _customOverlayColor = false;
   bool _showEnter = true;
   bool _showBackspace = true;
 
@@ -31,6 +32,9 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      themeMode: ThemeMode.system,
+      theme: ThemeData.light(),
+      darkTheme: ThemeData.dark(),
       home: Scaffold(
         appBar: AppBar(
           title: const Text('Native Virtual Keyboard'),
@@ -95,6 +99,12 @@ class _MyAppState extends State<MyApp> {
                         value: _showBackspace,
                         onChanged: (v) => setState(() => _showBackspace = v),
                       ),
+                      SwitchListTile(
+                        title: const Text('Custom Overlay Color (Purple)'),
+                        value: _customOverlayColor,
+                        onChanged: (v) =>
+                            setState(() => _customOverlayColor = v),
+                      ),
                       const SizedBox(height: 16),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 22),
@@ -136,6 +146,13 @@ class _MyAppState extends State<MyApp> {
                         fontStyle: FontStyle.italic,
                       )
                     : null,
+
+                // Custom overlay background color
+                overlayBackgroundColor: _customOverlayColor
+                    ? Colors.deepPurple.shade300
+                    : null,
+                // Custom overlay text color
+                overlayTextColor: _customOverlayColor ? Colors.white : null,
 
                 controller: VirtualKeyboardController(
                   layout: EnglishQwertyKeyboardLayout(),

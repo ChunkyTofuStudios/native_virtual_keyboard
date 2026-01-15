@@ -21,6 +21,8 @@ final class Ios26Keyboard extends BaseKeyboard {
     super.keyShadow,
     super.keyInnerShadow,
     super.specialKeyWidthMultiplier,
+    super.overlayBackgroundColor,
+    super.overlayTextColor,
   });
 
   @override
@@ -60,7 +62,8 @@ class _KeyPressOverlay extends StatelessWidget {
       children: [
         Assets.images.ios26KeyPressedOverlay.svg(
           colorFilter: ColorFilter.mode(
-            params.theme.keyTheme.pressedBackgroundColor,
+            params.overlayBackgroundColor ??
+                params.theme.keyTheme.pressedBackgroundColor,
             BlendMode.srcIn,
           ),
         ),
@@ -72,10 +75,11 @@ class _KeyPressOverlay extends StatelessWidget {
             child: FittedBox(
               child: AutoSizeText(
                 params.key.text,
-                style: TextTheme.of(context).bodyLarge?.copyWith(
-                  color: params.theme.keyTheme.foregroundColor,
+                style: TextStyle(
+                  color: params.overlayTextColor ??
+                      params.theme.keyTheme.foregroundColor,
                   fontSize: 32,
-                ),
+                ).merge(params.controller.overlayTextTheme),
                 maxLines: 1,
                 minFontSize: 4,
                 textAlign: TextAlign.center,

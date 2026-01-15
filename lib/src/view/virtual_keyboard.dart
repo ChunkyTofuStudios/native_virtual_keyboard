@@ -50,6 +50,14 @@ final class VirtualKeyboard extends StatelessWidget {
   /// Multiplier for the width of special keys.
   final double? specialKeyWidthMultiplier;
 
+  /// The background color of the key press overlay popup.
+  /// If not provided, defaults to the key background color.
+  final Color? overlayBackgroundColor;
+
+  /// The text color of the key press overlay popup.
+  /// If not provided, defaults to the theme's foreground color.
+  final Color? overlayTextColor;
+
   const VirtualKeyboard({
     super.key,
     required this.controller,
@@ -64,6 +72,8 @@ final class VirtualKeyboard extends StatelessWidget {
     this.keyShadow,
     this.keyInnerShadow,
     this.specialKeyWidthMultiplier,
+    this.overlayBackgroundColor,
+    this.overlayTextColor,
   });
 
   @override
@@ -91,6 +101,8 @@ final class VirtualKeyboard extends StatelessWidget {
             keyShadow: keyShadow,
             keyInnerShadow: keyInnerShadow,
             specialKeyWidthMultiplier: specialKeyWidthMultiplier,
+            overlayBackgroundColor: overlayBackgroundColor,
+            overlayTextColor: overlayTextColor,
           ),
           KeyboardPlatform.ios18 => Ios18Keyboard(
             controller: controller,
@@ -104,6 +116,8 @@ final class VirtualKeyboard extends StatelessWidget {
             keyShadow: keyShadow,
             keyInnerShadow: keyInnerShadow,
             specialKeyWidthMultiplier: specialKeyWidthMultiplier,
+            overlayBackgroundColor: overlayBackgroundColor,
+            overlayTextColor: overlayTextColor,
           ),
           KeyboardPlatform.ios26 => Ios26Keyboard(
             controller: controller,
@@ -117,6 +131,8 @@ final class VirtualKeyboard extends StatelessWidget {
             keyShadow: keyShadow,
             keyInnerShadow: keyInnerShadow,
             specialKeyWidthMultiplier: specialKeyWidthMultiplier,
+            overlayBackgroundColor: overlayBackgroundColor,
+            overlayTextColor: overlayTextColor,
           ),
         };
       },

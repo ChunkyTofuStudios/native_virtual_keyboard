@@ -27,6 +27,8 @@ abstract class BaseKeyboard extends StatefulWidget {
   final List<BoxShadow>? keyShadow;
   final List<BoxShadow>? keyInnerShadow;
   final double? specialKeyWidthMultiplier;
+  final Color? overlayBackgroundColor;
+  final Color? overlayTextColor;
 
   const BaseKeyboard({
     super.key,
@@ -42,6 +44,8 @@ abstract class BaseKeyboard extends StatefulWidget {
     this.keyShadow,
     this.keyInnerShadow,
     this.specialKeyWidthMultiplier,
+    this.overlayBackgroundColor,
+    this.overlayTextColor,
   });
 
   KeyboardTheme getTheme(Brightness brightness);
@@ -152,6 +156,8 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
                               .overlayFollowerBuilder(),
                           controller: widget.controller,
                           keyTextStyle: effectiveKeyTextStyle,
+                          overlayBackgroundColor: widget.overlayBackgroundColor,
+                          overlayTextColor: widget.overlayTextColor,
                         ),
                       ),
                     ),
@@ -179,6 +185,8 @@ final class KeyParams {
   final OverlayFollowerBuilder overlayFollowerBuilder;
   final VirtualKeyboardController controller;
   final TextStyle? keyTextStyle;
+  final Color? overlayBackgroundColor;
+  final Color? overlayTextColor;
 
   const KeyParams({
     required this.key,
@@ -192,6 +200,8 @@ final class KeyParams {
     required this.overlayFollowerBuilder,
     required this.controller,
     required this.keyTextStyle,
+    this.overlayBackgroundColor,
+    this.overlayTextColor,
   });
 }
 
