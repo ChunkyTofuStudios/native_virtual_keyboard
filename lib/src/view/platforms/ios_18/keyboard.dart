@@ -5,32 +5,23 @@ import 'package:native_virtual_keyboard/src/view/keyboard_dimensions.dart';
 import 'package:native_virtual_keyboard/src/view/keyboard_theme.dart';
 import 'package:native_virtual_keyboard/src/view/platforms/base_keyboard.dart';
 import 'package:native_virtual_keyboard/src/view/platforms/ios_18/dimensions.dart';
-import 'package:native_virtual_keyboard/src/view/platforms/ios_18/theme.dart';
 import 'package:native_virtual_keyboard/src/view/shadex.dart';
 
 final class Ios18Keyboard extends BaseKeyboard {
   const Ios18Keyboard({
     super.key,
     required super.controller,
-    super.backgroundColor,
-    super.keyBackgroundColor,
-    super.keyTextStyle,
-    super.keyIconColor,
-    super.specialKeyBackgroundColor,
+    super.theme,
     super.showEnter,
     super.showBackspace,
-    super.keyShadow,
-    super.keyInnerShadow,
     super.specialKeyWidthMultiplier,
-    super.overlayBackgroundColor,
-    super.overlayTextColor,
   });
 
   @override
   KeyboardTheme getTheme(Brightness brightness) {
     return switch (brightness) {
-      Brightness.light => Ios18KeyboardThemeLight(),
-      Brightness.dark => Ios18KeyboardThemeDark(),
+      Brightness.light => KeyboardTheme.ios18Light(),
+      Brightness.dark => KeyboardTheme.ios18Dark(),
     };
   }
 
@@ -47,7 +38,7 @@ final class Ios18Keyboard extends BaseKeyboard {
       targetAnchor: Alignment.bottomCenter,
       followerAnchor: Alignment.bottomCenter,
       offset: Offset(0, -params.padding.vertical / 2),
-      child: _KeyPressOverlay(params: params), // Same as iOS 26
+      child: _KeyPressOverlay(params: params),
     );
   }
 }
@@ -67,7 +58,7 @@ class _KeyPressOverlay extends StatelessWidget {
           shadowOffset: Offset.zero,
           child: Assets.images.ios18KeyPressedOverlay.svg(
             colorFilter: ColorFilter.mode(
-              params.overlayBackgroundColor ??
+              params.theme.keyTheme.overlayBackgroundColor ??
                   params.theme.keyTheme.pressedBackgroundColor,
               BlendMode.srcIn,
             ),
@@ -83,7 +74,7 @@ class _KeyPressOverlay extends StatelessWidget {
                 params.key.text,
                 style: TextStyle(
                   color:
-                      params.overlayTextColor ??
+                      params.theme.keyTheme.overlayTextColor ??
                       params.theme.keyTheme.foregroundColor,
                   fontSize: 32,
                 ).merge(params.controller.overlayTextTheme),

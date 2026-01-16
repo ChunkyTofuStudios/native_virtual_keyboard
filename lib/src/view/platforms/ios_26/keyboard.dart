@@ -5,31 +5,22 @@ import 'package:native_virtual_keyboard/src/view/keyboard_dimensions.dart';
 import 'package:native_virtual_keyboard/src/view/keyboard_theme.dart';
 import 'package:native_virtual_keyboard/src/view/platforms/base_keyboard.dart';
 import 'package:native_virtual_keyboard/src/view/platforms/ios_26/dimensions.dart';
-import 'package:native_virtual_keyboard/src/view/platforms/ios_26/theme.dart';
 
 final class Ios26Keyboard extends BaseKeyboard {
   const Ios26Keyboard({
     super.key,
     required super.controller,
-    super.backgroundColor,
-    super.keyBackgroundColor,
-    super.keyTextStyle,
-    super.keyIconColor,
-    super.specialKeyBackgroundColor,
+    super.theme,
     super.showEnter,
     super.showBackspace,
-    super.keyShadow,
-    super.keyInnerShadow,
     super.specialKeyWidthMultiplier,
-    super.overlayBackgroundColor,
-    super.overlayTextColor,
   });
 
   @override
   KeyboardTheme getTheme(Brightness brightness) {
     return switch (brightness) {
-      Brightness.light => Ios26KeyboardThemeLight(),
-      Brightness.dark => Ios26KeyboardThemeDark(),
+      Brightness.light => KeyboardTheme.ios26Light(),
+      Brightness.dark => KeyboardTheme.ios26Dark(),
     };
   }
 
@@ -62,7 +53,7 @@ class _KeyPressOverlay extends StatelessWidget {
       children: [
         Assets.images.ios26KeyPressedOverlay.svg(
           colorFilter: ColorFilter.mode(
-            params.overlayBackgroundColor ??
+            params.theme.keyTheme.overlayBackgroundColor ??
                 params.theme.keyTheme.pressedBackgroundColor,
             BlendMode.srcIn,
           ),
@@ -77,7 +68,7 @@ class _KeyPressOverlay extends StatelessWidget {
                 params.key.text,
                 style: TextStyle(
                   color:
-                      params.overlayTextColor ??
+                      params.theme.keyTheme.overlayTextColor ??
                       params.theme.keyTheme.foregroundColor,
                   fontSize: 32,
                 ).merge(params.controller.overlayTextTheme),

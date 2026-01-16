@@ -3,32 +3,23 @@ import 'package:flutter/material.dart';
 import 'package:native_virtual_keyboard/src/view/keyboard_dimensions.dart';
 import 'package:native_virtual_keyboard/src/view/keyboard_theme.dart';
 import 'package:native_virtual_keyboard/src/view/platforms/android/dimensions.dart';
-import 'package:native_virtual_keyboard/src/view/platforms/android/theme.dart';
 import 'package:native_virtual_keyboard/src/view/platforms/base_keyboard.dart';
 
 final class AndroidKeyboard extends BaseKeyboard {
   const AndroidKeyboard({
     super.key,
     required super.controller,
-    super.backgroundColor,
-    super.keyBackgroundColor,
-    super.keyTextStyle,
-    super.keyIconColor,
-    super.specialKeyBackgroundColor,
+    super.theme,
     super.showEnter,
     super.showBackspace,
-    super.keyShadow,
-    super.keyInnerShadow,
     super.specialKeyWidthMultiplier,
-    super.overlayBackgroundColor,
-    super.overlayTextColor,
   });
 
   @override
   KeyboardTheme getTheme(Brightness brightness) {
     return switch (brightness) {
-      Brightness.light => AndroidKeyboardThemeLight(),
-      Brightness.dark => AndroidKeyboardThemeDark(),
+      Brightness.light => KeyboardTheme.androidLight(),
+      Brightness.dark => KeyboardTheme.androidDark(),
     };
   }
 
@@ -59,7 +50,7 @@ class _KeyPressOverlay extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       color:
-          params.overlayBackgroundColor ??
+          params.theme.keyTheme.overlayBackgroundColor ??
           params.theme.keyTheme.backgroundColor,
       shape: const CircleBorder(),
       elevation: 2,
@@ -74,7 +65,7 @@ class _KeyPressOverlay extends StatelessWidget {
             params.key.text,
             style: TextStyle(
               color:
-                  params.overlayTextColor ??
+                  params.theme.keyTheme.overlayTextColor ??
                   params.theme.keyTheme.foregroundColor,
               fontSize: 32,
             ).merge(params.controller.overlayTextTheme),

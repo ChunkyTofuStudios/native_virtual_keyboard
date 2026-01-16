@@ -6,11 +6,20 @@ import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:native_virtual_keyboard/src/extensions/ios_version_infos.dart';
 import 'package:native_virtual_keyboard/src/view/keyboard_platform.dart';
+import 'package:native_virtual_keyboard/src/view/keyboard_theme.dart';
 import 'package:native_virtual_keyboard/src/view/platforms/android/keyboard.dart';
 import 'package:native_virtual_keyboard/src/view/platforms/ios_18/keyboard.dart';
 import 'package:native_virtual_keyboard/src/view/platforms/ios_26/keyboard.dart';
 import 'package:native_virtual_keyboard/src/view/virtual_keyboard_controller.dart';
 
+/// A virtual keyboard widget that mimics native iOS and Android keyboards.
+///
+/// Use [theme] to customize the appearance. Pre-built themes are available:
+/// - [KeyboardTheme.androidLight] / [KeyboardTheme.androidDark]
+/// - [KeyboardTheme.ios18Light] / [KeyboardTheme.ios18Dark]
+/// - [KeyboardTheme.ios26Light] / [KeyboardTheme.ios26Dark]
+///
+/// For custom themes, create a new [KeyboardTheme] instance.
 final class VirtualKeyboard extends StatelessWidget {
   static final _log = Logger('VirtualKeyboard');
 
@@ -20,20 +29,12 @@ final class VirtualKeyboard extends StatelessWidget {
   /// The controller for the keyboard.
   final VirtualKeyboardController controller;
 
-  /// The background color of the keyboard.
-  final Color? backgroundColor;
+  /// Complete theme for the keyboard.
+  /// If not provided, the default platform theme will be used.
+  final KeyboardTheme? theme;
 
-  /// The color of the keys.
-  final Color? keyBackgroundColor;
-
-  /// The text style of the keys.
-  final TextStyle? keyTextStyle;
-
-  /// The color of the icons on the keys.
-  final Color? keyIconColor;
-
-  /// The background color of the special keys.
-  final Color? specialKeyBackgroundColor;
+  /// Multiplier for the width of special keys.
+  final double? specialKeyWidthMultiplier;
 
   /// Whether to show the enter key.
   final bool showEnter;
@@ -41,39 +42,14 @@ final class VirtualKeyboard extends StatelessWidget {
   /// Whether to show the backspace key.
   final bool showBackspace;
 
-  /// The shadows of the keys.
-  final List<BoxShadow>? keyShadow;
-
-  /// The inner shadows of the keys.
-  final List<BoxShadow>? keyInnerShadow;
-
-  /// Multiplier for the width of special keys.
-  final double? specialKeyWidthMultiplier;
-
-  /// The background color of the key press overlay popup.
-  /// If not provided, defaults to the key background color.
-  final Color? overlayBackgroundColor;
-
-  /// The text color of the key press overlay popup.
-  /// If not provided, defaults to the theme's foreground color.
-  final Color? overlayTextColor;
-
   const VirtualKeyboard({
     super.key,
     required this.controller,
     this.platform,
-    this.backgroundColor,
-    this.keyBackgroundColor,
-    this.keyIconColor,
-    this.specialKeyBackgroundColor,
-    this.keyTextStyle,
+    this.theme,
+    this.specialKeyWidthMultiplier,
     this.showEnter = true,
     this.showBackspace = true,
-    this.keyShadow,
-    this.keyInnerShadow,
-    this.specialKeyWidthMultiplier,
-    this.overlayBackgroundColor,
-    this.overlayTextColor,
   });
 
   @override
@@ -91,48 +67,24 @@ final class VirtualKeyboard extends StatelessWidget {
         return switch (effectivePlatform) {
           KeyboardPlatform.android => AndroidKeyboard(
             controller: controller,
-            backgroundColor: backgroundColor,
-            keyBackgroundColor: keyBackgroundColor,
-            keyTextStyle: keyTextStyle,
-            keyIconColor: keyIconColor,
-            specialKeyBackgroundColor: specialKeyBackgroundColor,
+            theme: theme,
             showEnter: showEnter,
             showBackspace: showBackspace,
-            keyShadow: keyShadow,
-            keyInnerShadow: keyInnerShadow,
             specialKeyWidthMultiplier: specialKeyWidthMultiplier,
-            overlayBackgroundColor: overlayBackgroundColor,
-            overlayTextColor: overlayTextColor,
           ),
           KeyboardPlatform.ios18 => Ios18Keyboard(
             controller: controller,
-            backgroundColor: backgroundColor,
-            keyBackgroundColor: keyBackgroundColor,
-            keyTextStyle: keyTextStyle,
-            keyIconColor: keyIconColor,
-            specialKeyBackgroundColor: specialKeyBackgroundColor,
+            theme: theme,
             showEnter: showEnter,
             showBackspace: showBackspace,
-            keyShadow: keyShadow,
-            keyInnerShadow: keyInnerShadow,
             specialKeyWidthMultiplier: specialKeyWidthMultiplier,
-            overlayBackgroundColor: overlayBackgroundColor,
-            overlayTextColor: overlayTextColor,
           ),
           KeyboardPlatform.ios26 => Ios26Keyboard(
             controller: controller,
-            backgroundColor: backgroundColor,
-            keyBackgroundColor: keyBackgroundColor,
-            keyTextStyle: keyTextStyle,
-            keyIconColor: keyIconColor,
-            specialKeyBackgroundColor: specialKeyBackgroundColor,
+            theme: theme,
             showEnter: showEnter,
             showBackspace: showBackspace,
-            keyShadow: keyShadow,
-            keyInnerShadow: keyInnerShadow,
             specialKeyWidthMultiplier: specialKeyWidthMultiplier,
-            overlayBackgroundColor: overlayBackgroundColor,
-            overlayTextColor: overlayTextColor,
           ),
         };
       },
