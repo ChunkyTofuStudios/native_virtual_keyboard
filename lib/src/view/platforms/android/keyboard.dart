@@ -3,32 +3,55 @@ import 'package:flutter/material.dart';
 import 'package:native_virtual_keyboard/src/view/keyboard_dimensions.dart';
 import 'package:native_virtual_keyboard/src/view/keyboard_theme.dart';
 import 'package:native_virtual_keyboard/src/view/platforms/android/dimensions.dart';
-import 'package:native_virtual_keyboard/src/view/platforms/android/theme.dart';
 import 'package:native_virtual_keyboard/src/view/platforms/base_keyboard.dart';
 
 final class AndroidKeyboard extends BaseKeyboard {
   const AndroidKeyboard({
     super.key,
     required super.controller,
-    super.backgroundColor,
-    super.keyBackgroundColor,
-    super.keyTextStyle,
-    super.keyIconColor,
-    super.specialKeyBackgroundColor,
+    super.theme,
     super.showEnter,
     super.showBackspace,
-    super.keyShadow,
-    super.keyInnerShadow,
     super.specialKeyWidthMultiplier,
-    super.overlayBackgroundColor,
-    super.overlayTextColor,
   });
+
+  static const lightTheme = KeyboardTheme(
+    backgroundColor: Color(0xFFEEEDF6),
+    keyTheme: KeyboardKeyTheme(
+      backgroundColor: Color(0xFFFFFFFF),
+      pressedBackgroundColor: Color(0xFFEEEDF6),
+      foregroundColor: Color(0xFF30323B),
+    ),
+    specialKeyTheme: KeyboardSpecialKeyTheme(
+      backgroundColor: Color(0xFFDDE2F9),
+      foregroundColor: Color(0xFF4B5164),
+      pressedBackgroundColor: Color(0xFFDDE2F9),
+      pressedOverlayColor: Colors.black12,
+      pressedFillIcon: false,
+    ),
+  );
+
+  static const darkTheme = KeyboardTheme(
+    backgroundColor: Color(0xFF181920),
+    keyTheme: KeyboardKeyTheme(
+      backgroundColor: Color(0xFF23252E),
+      pressedBackgroundColor: Color(0xFF181920),
+      foregroundColor: Color(0xFFE4E5F0),
+    ),
+    specialKeyTheme: KeyboardSpecialKeyTheme(
+      backgroundColor: Color(0xFF353B4D),
+      foregroundColor: Color(0xFFB9BED5),
+      pressedBackgroundColor: Color(0xFF353B4D),
+      pressedOverlayColor: Colors.white12,
+      pressedFillIcon: false,
+    ),
+  );
 
   @override
   KeyboardTheme getTheme(Brightness brightness) {
     return switch (brightness) {
-      Brightness.light => AndroidKeyboardThemeLight(),
-      Brightness.dark => AndroidKeyboardThemeDark(),
+      Brightness.light => lightTheme,
+      Brightness.dark => darkTheme,
     };
   }
 
@@ -59,7 +82,7 @@ class _KeyPressOverlay extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       color:
-          params.overlayBackgroundColor ??
+          params.theme.keyTheme.overlayBackgroundColor ??
           params.theme.keyTheme.backgroundColor,
       shape: const CircleBorder(),
       elevation: 2,
@@ -74,7 +97,7 @@ class _KeyPressOverlay extends StatelessWidget {
             params.key.text,
             style: TextStyle(
               color:
-                  params.overlayTextColor ??
+                  params.theme.keyTheme.overlayTextColor ??
                   params.theme.keyTheme.foregroundColor,
               fontSize: 32,
             ).merge(params.controller.overlayTextTheme),
