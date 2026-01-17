@@ -17,11 +17,45 @@ final class Ios18Keyboard extends BaseKeyboard {
     super.specialKeyWidthMultiplier,
   });
 
+  static const lightTheme = KeyboardTheme(
+    backgroundColor: Color(0xFFC8CFE1),
+    topBorderColor: Color(0xFFCBD8FA),
+    keyTheme: KeyboardKeyTheme(
+      backgroundColor: Color(0xFFFFFFFF),
+      pressedBackgroundColor: Color(0xFFFFFFFF),
+      foregroundColor: Color(0xFF000000),
+    ),
+    specialKeyTheme: KeyboardSpecialKeyTheme(
+      backgroundColor: Color(0xFF9AA7C7),
+      foregroundColor: Color(0xFF00010E),
+      pressedBackgroundColor: Color(0xFFFFFFFF),
+      pressedOverlayColor: null,
+      pressedFillIcon: true,
+    ),
+  );
+
+  static const darkTheme = KeyboardTheme(
+    backgroundColor: Color(0xFF333333),
+    topBorderColor: Color(0xFF242424),
+    keyTheme: KeyboardKeyTheme(
+      backgroundColor: Color(0xFF707070),
+      pressedBackgroundColor: Color(0xFF707070),
+      foregroundColor: Color(0xFFFFFFFF),
+    ),
+    specialKeyTheme: KeyboardSpecialKeyTheme(
+      backgroundColor: Color(0xFF4C4C4C),
+      foregroundColor: Color(0xFFFFFFFF),
+      pressedBackgroundColor: Color(0xFF696A6C),
+      pressedOverlayColor: null,
+      pressedFillIcon: true,
+    ),
+  );
+
   @override
   KeyboardTheme getTheme(Brightness brightness) {
     return switch (brightness) {
-      Brightness.light => KeyboardTheme.ios18Light(),
-      Brightness.dark => KeyboardTheme.ios18Dark(),
+      Brightness.light => lightTheme,
+      Brightness.dark => darkTheme,
     };
   }
 

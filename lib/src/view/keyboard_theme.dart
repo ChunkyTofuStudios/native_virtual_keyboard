@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:native_virtual_keyboard/src/view/platforms/android/keyboard.dart';
+import 'package:native_virtual_keyboard/src/view/platforms/ios_18/keyboard.dart';
+import 'package:native_virtual_keyboard/src/view/platforms/ios_26/keyboard.dart';
 
 /// Complete theme configuration for the virtual keyboard.
 ///
@@ -34,113 +37,13 @@ final class KeyboardTheme {
   });
 
   // Factory constructors for pre-built themes
-  factory KeyboardTheme.androidLight() => _androidLight;
-  factory KeyboardTheme.androidDark() => _androidDark;
-  factory KeyboardTheme.ios18Light() => _ios18Light;
-  factory KeyboardTheme.ios18Dark() => _ios18Dark;
-  factory KeyboardTheme.ios26Light() => _ios26Light;
-  factory KeyboardTheme.ios26Dark() => _ios26Dark;
-
-  // Static const instances
-  static const _androidLight = KeyboardTheme(
-    backgroundColor: Color(0xFFEEEDF6),
-    keyTheme: KeyboardKeyTheme(
-      backgroundColor: Color(0xFFFFFFFF),
-      pressedBackgroundColor: Color(0xFFEEEDF6),
-      foregroundColor: Color(0xFF30323B),
-    ),
-    specialKeyTheme: KeyboardSpecialKeyTheme(
-      backgroundColor: Color(0xFFDDE2F9),
-      foregroundColor: Color(0xFF4B5164),
-      pressedBackgroundColor: Color(0xFFDDE2F9),
-      pressedOverlayColor: Colors.black12,
-      pressedFillIcon: false,
-    ),
-  );
-
-  static const _androidDark = KeyboardTheme(
-    backgroundColor: Color(0xFF181920),
-    keyTheme: KeyboardKeyTheme(
-      backgroundColor: Color(0xFF23252E),
-      pressedBackgroundColor: Color(0xFF181920),
-      foregroundColor: Color(0xFFE4E5F0),
-    ),
-    specialKeyTheme: KeyboardSpecialKeyTheme(
-      backgroundColor: Color(0xFF353B4D),
-      foregroundColor: Color(0xFFB9BED5),
-      pressedBackgroundColor: Color(0xFF353B4D),
-      pressedOverlayColor: Colors.white12,
-      pressedFillIcon: false,
-    ),
-  );
-
-  static const _ios18Light = KeyboardTheme(
-    backgroundColor: Color(0xFFC8CFE1),
-    topBorderColor: Color(0xFFCBD8FA),
-    keyTheme: KeyboardKeyTheme(
-      backgroundColor: Color(0xFFFFFFFF),
-      pressedBackgroundColor: Color(0xFFFFFFFF),
-      foregroundColor: Color(0xFF000000),
-    ),
-    specialKeyTheme: KeyboardSpecialKeyTheme(
-      backgroundColor: Color(0xFF9AA7C7),
-      foregroundColor: Color(0xFF00010E),
-      pressedBackgroundColor: Color(0xFFFFFFFF),
-      pressedOverlayColor: null,
-      pressedFillIcon: true,
-    ),
-  );
-
-  static const _ios18Dark = KeyboardTheme(
-    backgroundColor: Color(0xFF333333),
-    topBorderColor: Color(0xFF242424),
-    keyTheme: KeyboardKeyTheme(
-      backgroundColor: Color(0xFF707070),
-      pressedBackgroundColor: Color(0xFF707070),
-      foregroundColor: Color(0xFFFFFFFF),
-    ),
-    specialKeyTheme: KeyboardSpecialKeyTheme(
-      backgroundColor: Color(0xFF4C4C4C),
-      foregroundColor: Color(0xFFFFFFFF),
-      pressedBackgroundColor: Color(0xFF696A6C),
-      pressedOverlayColor: null,
-      pressedFillIcon: true,
-    ),
-  );
-
-  static const _ios26Light = KeyboardTheme(
-    backgroundColor: Color(0xFFA1ADD1),
-    topBorderColor: Color(0xFFDEEFFA),
-    keyTheme: KeyboardKeyTheme(
-      backgroundColor: Color(0xFFE8F0FF),
-      pressedBackgroundColor: Color(0xFFF7FCFF),
-      foregroundColor: Color(0xFF000000),
-    ),
-    specialKeyTheme: KeyboardSpecialKeyTheme(
-      backgroundColor: Color(0xFFE8F0FF),
-      foregroundColor: Color(0xFF000000),
-      pressedBackgroundColor: Color(0xFFACB7D9),
-      pressedOverlayColor: null,
-      pressedFillIcon: true,
-    ),
-  );
-
-  static const _ios26Dark = KeyboardTheme(
-    backgroundColor: Color(0xFF17203F),
-    topBorderColor: Color(0xFF2F4AA1),
-    keyTheme: KeyboardKeyTheme(
-      backgroundColor: Color(0xFF3D445B),
-      pressedBackgroundColor: Color(0xFF53596C),
-      foregroundColor: Color(0xFFFFFFFF),
-    ),
-    specialKeyTheme: KeyboardSpecialKeyTheme(
-      backgroundColor: Color(0xFF3D445B),
-      foregroundColor: Color(0xFFFFFFFF),
-      pressedBackgroundColor: Color(0xFF262E4A),
-      pressedOverlayColor: null,
-      pressedFillIcon: true,
-    ),
-  );
+  // Factory constructors for pre-built themes
+  factory KeyboardTheme.androidLight() => AndroidKeyboard.lightTheme;
+  factory KeyboardTheme.androidDark() => AndroidKeyboard.darkTheme;
+  factory KeyboardTheme.ios18Light() => Ios18Keyboard.lightTheme;
+  factory KeyboardTheme.ios18Dark() => Ios18Keyboard.darkTheme;
+  factory KeyboardTheme.ios26Light() => Ios26Keyboard.lightTheme;
+  factory KeyboardTheme.ios26Dark() => Ios26Keyboard.darkTheme;
 
   KeyboardTheme copyWith({
     Color? backgroundColor,

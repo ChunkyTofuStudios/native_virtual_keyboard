@@ -15,11 +15,43 @@ final class AndroidKeyboard extends BaseKeyboard {
     super.specialKeyWidthMultiplier,
   });
 
+  static const lightTheme = KeyboardTheme(
+    backgroundColor: Color(0xFFEEEDF6),
+    keyTheme: KeyboardKeyTheme(
+      backgroundColor: Color(0xFFFFFFFF),
+      pressedBackgroundColor: Color(0xFFEEEDF6),
+      foregroundColor: Color(0xFF30323B),
+    ),
+    specialKeyTheme: KeyboardSpecialKeyTheme(
+      backgroundColor: Color(0xFFDDE2F9),
+      foregroundColor: Color(0xFF4B5164),
+      pressedBackgroundColor: Color(0xFFDDE2F9),
+      pressedOverlayColor: Colors.black12,
+      pressedFillIcon: false,
+    ),
+  );
+
+  static const darkTheme = KeyboardTheme(
+    backgroundColor: Color(0xFF181920),
+    keyTheme: KeyboardKeyTheme(
+      backgroundColor: Color(0xFF23252E),
+      pressedBackgroundColor: Color(0xFF181920),
+      foregroundColor: Color(0xFFE4E5F0),
+    ),
+    specialKeyTheme: KeyboardSpecialKeyTheme(
+      backgroundColor: Color(0xFF353B4D),
+      foregroundColor: Color(0xFFB9BED5),
+      pressedBackgroundColor: Color(0xFF353B4D),
+      pressedOverlayColor: Colors.white12,
+      pressedFillIcon: false,
+    ),
+  );
+
   @override
   KeyboardTheme getTheme(Brightness brightness) {
     return switch (brightness) {
-      Brightness.light => KeyboardTheme.androidLight(),
-      Brightness.dark => KeyboardTheme.androidDark(),
+      Brightness.light => lightTheme,
+      Brightness.dark => darkTheme,
     };
   }
 

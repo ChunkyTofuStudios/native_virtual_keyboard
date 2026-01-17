@@ -29,8 +29,12 @@ final class VirtualKeyboard extends StatelessWidget {
   /// The controller for the keyboard.
   final VirtualKeyboardController controller;
 
-  /// Complete theme for the keyboard.
-  /// If not provided, the default platform theme will be used.
+  /// The visual theme of the keyboard (colors, fonts, shadows).
+  ///
+  /// If provided, this theme will override the default platform-specific styling.
+  /// If null (variable not passed), the keyboard will automatically use the
+  /// default native theme that mirrors the current platform's system keyboard
+  /// (based on [platform] and system brightness).
   final KeyboardTheme? theme;
 
   /// Multiplier for the width of special keys.

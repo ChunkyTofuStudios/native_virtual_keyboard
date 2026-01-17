@@ -16,11 +16,45 @@ final class Ios26Keyboard extends BaseKeyboard {
     super.specialKeyWidthMultiplier,
   });
 
+  static const lightTheme = KeyboardTheme(
+    backgroundColor: Color(0xFFA1ADD1),
+    topBorderColor: Color(0xFFDEEFFA),
+    keyTheme: KeyboardKeyTheme(
+      backgroundColor: Color(0xFFE8F0FF),
+      pressedBackgroundColor: Color(0xFFF7FCFF),
+      foregroundColor: Color(0xFF000000),
+    ),
+    specialKeyTheme: KeyboardSpecialKeyTheme(
+      backgroundColor: Color(0xFFE8F0FF),
+      foregroundColor: Color(0xFF000000),
+      pressedBackgroundColor: Color(0xFFACB7D9),
+      pressedOverlayColor: null,
+      pressedFillIcon: true,
+    ),
+  );
+
+  static const darkTheme = KeyboardTheme(
+    backgroundColor: Color(0xFF17203F),
+    topBorderColor: Color(0xFF2F4AA1),
+    keyTheme: KeyboardKeyTheme(
+      backgroundColor: Color(0xFF3D445B),
+      pressedBackgroundColor: Color(0xFF53596C),
+      foregroundColor: Color(0xFFFFFFFF),
+    ),
+    specialKeyTheme: KeyboardSpecialKeyTheme(
+      backgroundColor: Color(0xFF3D445B),
+      foregroundColor: Color(0xFFFFFFFF),
+      pressedBackgroundColor: Color(0xFF262E4A),
+      pressedOverlayColor: null,
+      pressedFillIcon: true,
+    ),
+  );
+
   @override
   KeyboardTheme getTheme(Brightness brightness) {
     return switch (brightness) {
-      Brightness.light => KeyboardTheme.ios26Light(),
-      Brightness.dark => KeyboardTheme.ios26Dark(),
+      Brightness.light => lightTheme,
+      Brightness.dark => darkTheme,
     };
   }
 
