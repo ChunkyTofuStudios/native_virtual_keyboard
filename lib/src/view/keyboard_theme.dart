@@ -27,7 +27,6 @@ final class KeyboardTheme {
 
   /// The text style for key labels.
 
-
   const KeyboardTheme({
     required this.backgroundColor,
     this.topBorderColor,

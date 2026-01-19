@@ -1,3 +1,7 @@
+## 0.2.2
+
+* Simplify theme customization
+
 ## 0.2.1
 
 * Allow customizing overlay colors
