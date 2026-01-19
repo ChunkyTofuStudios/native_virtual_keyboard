@@ -330,7 +330,7 @@ class _KeyButton extends StatelessWidget {
   }
 
   Widget _buildKeyContent(BuildContext context) {
-    final keyTextStyle = data.theme.keyTextStyle;
+    final keyTextStyle = data.theme.keyTheme.keyTextStyle;
     return AutoSizeText(
       data.key.text,
       style: (data.controller.textTheme ?? keyTextStyle)

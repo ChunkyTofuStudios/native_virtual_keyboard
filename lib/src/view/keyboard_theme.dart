@@ -26,14 +26,13 @@ final class KeyboardTheme {
   final KeyboardSpecialKeyTheme specialKeyTheme;
 
   /// The text style for key labels.
-  final TextStyle? keyTextStyle;
+
 
   const KeyboardTheme({
     required this.backgroundColor,
     this.topBorderColor,
     required this.keyTheme,
     required this.specialKeyTheme,
-    this.keyTextStyle,
   });
 
   // Factory constructors for pre-built themes
@@ -50,14 +49,12 @@ final class KeyboardTheme {
     Color? topBorderColor,
     KeyboardKeyTheme? keyTheme,
     KeyboardSpecialKeyTheme? specialKeyTheme,
-    TextStyle? keyTextStyle,
   }) {
     return KeyboardTheme(
       backgroundColor: backgroundColor ?? this.backgroundColor,
       topBorderColor: topBorderColor ?? this.topBorderColor,
       keyTheme: keyTheme ?? this.keyTheme,
       specialKeyTheme: specialKeyTheme ?? this.specialKeyTheme,
-      keyTextStyle: keyTextStyle ?? this.keyTextStyle,
     );
   }
 }
@@ -85,6 +82,9 @@ final class KeyboardKeyTheme {
   /// The text color of the key press overlay popup.
   final Color? overlayTextColor;
 
+  /// The text style for key labels.
+  final TextStyle? keyTextStyle;
+
   const KeyboardKeyTheme({
     required this.backgroundColor,
     required this.pressedBackgroundColor,
@@ -93,6 +93,7 @@ final class KeyboardKeyTheme {
     this.innerShadows,
     this.overlayBackgroundColor,
     this.overlayTextColor,
+    this.keyTextStyle,
   });
 
   KeyboardKeyTheme copyWith({
@@ -103,6 +104,7 @@ final class KeyboardKeyTheme {
     List<BoxShadow>? innerShadows,
     Color? overlayBackgroundColor,
     Color? overlayTextColor,
+    TextStyle? keyTextStyle,
   }) {
     return KeyboardKeyTheme(
       backgroundColor: backgroundColor ?? this.backgroundColor,
@@ -136,6 +138,7 @@ final class KeyboardSpecialKeyTheme extends KeyboardKeyTheme {
     required this.pressedFillIcon,
     super.overlayBackgroundColor,
     super.overlayTextColor,
+    super.keyTextStyle,
   });
 
   @override
@@ -149,6 +152,7 @@ final class KeyboardSpecialKeyTheme extends KeyboardKeyTheme {
     bool? pressedFillIcon,
     Color? overlayBackgroundColor,
     Color? overlayTextColor,
+    TextStyle? keyTextStyle,
   }) {
     return KeyboardSpecialKeyTheme(
       backgroundColor: backgroundColor ?? this.backgroundColor,

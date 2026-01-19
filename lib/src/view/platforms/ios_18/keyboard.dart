@@ -72,7 +72,7 @@ final class Ios18Keyboard extends BaseKeyboard {
       targetAnchor: Alignment.bottomCenter,
       followerAnchor: Alignment.bottomCenter,
       offset: Offset(0, -params.padding.vertical / 2),
-      child: _KeyPressOverlay(params: params),
+      child: _KeyPressOverlay(params: params), // Same as iOS 26
     );
   }
 }

@@ -43,6 +43,11 @@ class _MyAppState extends State<MyApp> {
         // innerShadows: ... optional
         overlayBackgroundColor: Color(0xFF1E293B),
         overlayTextColor: Colors.white,
+        keyTextStyle: TextStyle(
+          fontSize: 22,
+          fontWeight: FontWeight.w500,
+          fontFamily: 'Roboto', // Or any custom font
+        ),
       ),
       specialKeyTheme: const KeyboardSpecialKeyTheme(
         backgroundColor: Color(0xFF334155),
@@ -53,11 +58,6 @@ class _MyAppState extends State<MyApp> {
         shadows: [
           BoxShadow(color: Colors.black45, offset: Offset(0, 2), blurRadius: 2),
         ],
-      ),
-      keyTextStyle: const TextStyle(
-        fontSize: 22,
-        fontWeight: FontWeight.w500,
-        fontFamily: 'Roboto', // Or any custom font
       ),
     );
   }
