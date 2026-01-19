@@ -5,32 +5,57 @@ import 'package:native_virtual_keyboard/src/view/keyboard_dimensions.dart';
 import 'package:native_virtual_keyboard/src/view/keyboard_theme.dart';
 import 'package:native_virtual_keyboard/src/view/platforms/base_keyboard.dart';
 import 'package:native_virtual_keyboard/src/view/platforms/ios_18/dimensions.dart';
-import 'package:native_virtual_keyboard/src/view/platforms/ios_18/theme.dart';
 import 'package:native_virtual_keyboard/src/view/shadex.dart';
 
 final class Ios18Keyboard extends BaseKeyboard {
   const Ios18Keyboard({
     super.key,
     required super.controller,
-    super.backgroundColor,
-    super.keyBackgroundColor,
-    super.keyTextStyle,
-    super.keyIconColor,
-    super.specialKeyBackgroundColor,
+    super.theme,
     super.showEnter,
     super.showBackspace,
-    super.keyShadow,
-    super.keyInnerShadow,
     super.specialKeyWidthMultiplier,
-    super.overlayBackgroundColor,
-    super.overlayTextColor,
   });
+
+  static const lightTheme = KeyboardTheme(
+    backgroundColor: Color(0xFFC8CFE1),
+    topBorderColor: Color(0xFFCBD8FA),
+    keyTheme: KeyboardKeyTheme(
+      backgroundColor: Color(0xFFFFFFFF),
+      pressedBackgroundColor: Color(0xFFFFFFFF),
+      foregroundColor: Color(0xFF000000),
+    ),
+    specialKeyTheme: KeyboardSpecialKeyTheme(
+      backgroundColor: Color(0xFF9AA7C7),
+      foregroundColor: Color(0xFF00010E),
+      pressedBackgroundColor: Color(0xFFFFFFFF),
+      pressedOverlayColor: null,
+      pressedFillIcon: true,
+    ),
+  );
+
+  static const darkTheme = KeyboardTheme(
+    backgroundColor: Color(0xFF333333),
+    topBorderColor: Color(0xFF242424),
+    keyTheme: KeyboardKeyTheme(
+      backgroundColor: Color(0xFF707070),
+      pressedBackgroundColor: Color(0xFF707070),
+      foregroundColor: Color(0xFFFFFFFF),
+    ),
+    specialKeyTheme: KeyboardSpecialKeyTheme(
+      backgroundColor: Color(0xFF4C4C4C),
+      foregroundColor: Color(0xFFFFFFFF),
+      pressedBackgroundColor: Color(0xFF696A6C),
+      pressedOverlayColor: null,
+      pressedFillIcon: true,
+    ),
+  );
 
   @override
   KeyboardTheme getTheme(Brightness brightness) {
     return switch (brightness) {
-      Brightness.light => Ios18KeyboardThemeLight(),
-      Brightness.dark => Ios18KeyboardThemeDark(),
+      Brightness.light => lightTheme,
+      Brightness.dark => darkTheme,
     };
   }
 
@@ -67,7 +92,7 @@ class _KeyPressOverlay extends StatelessWidget {
           shadowOffset: Offset.zero,
           child: Assets.images.ios18KeyPressedOverlay.svg(
             colorFilter: ColorFilter.mode(
-              params.overlayBackgroundColor ??
+              params.theme.keyTheme.overlayBackgroundColor ??
                   params.theme.keyTheme.pressedBackgroundColor,
               BlendMode.srcIn,
             ),
@@ -83,7 +108,7 @@ class _KeyPressOverlay extends StatelessWidget {
                 params.key.text,
                 style: TextStyle(
                   color:
-                      params.overlayTextColor ??
+                      params.theme.keyTheme.overlayTextColor ??
                       params.theme.keyTheme.foregroundColor,
                   fontSize: 32,
                 ).merge(params.controller.overlayTextTheme),

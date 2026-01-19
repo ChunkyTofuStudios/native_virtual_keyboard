@@ -13,15 +13,14 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  // Config state
   KeyboardPlatform? _selectedPlatform;
-  final _textController = TextEditingController();
-
-  // Theming state
-  bool _customColors = false;
-  bool _customStyle = false;
-  bool _customOverlayColor = false;
+  bool _useCustomTheme = false;
   bool _showEnter = true;
   bool _showBackspace = true;
+
+  // Text controller
+  final _textController = TextEditingController();
 
   @override
   void dispose() {
@@ -29,135 +28,161 @@ class _MyAppState extends State<MyApp> {
     super.dispose();
   }
 
+  // Example of a completely custom theme (e.g. "Midnight Blue")
+  KeyboardTheme get _customTheme {
+    // Start with a base, or build from scratch
+    return KeyboardTheme(
+      backgroundColor: const Color(0xFF0F172A), // Dark slate
+      keyTheme: const KeyboardKeyTheme(
+        backgroundColor: Color(0xFF1E293B), // Slate 800
+        pressedBackgroundColor: Color(0xFF334155), // Slate 700
+        foregroundColor: Colors.white,
+        shadows: [
+          BoxShadow(color: Colors.black45, offset: Offset(0, 2), blurRadius: 2),
+        ],
+        // innerShadows: ... optional
+        overlayBackgroundColor: Color(0xFF1E293B),
+        overlayTextColor: Colors.white,
+        keyTextStyle: TextStyle(
+          fontSize: 22,
+          fontWeight: FontWeight.w500,
+          fontFamily: 'Roboto', // Or any custom font
+        ),
+      ),
+      specialKeyTheme: const KeyboardSpecialKeyTheme(
+        backgroundColor: Color(0xFF334155),
+        pressedBackgroundColor: Color(0xFF475569),
+        foregroundColor: Colors.white,
+        pressedOverlayColor: Colors.white12,
+        pressedFillIcon: true,
+        shadows: [
+          BoxShadow(color: Colors.black45, offset: Offset(0, 2), blurRadius: 2),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.system,
-      theme: ThemeData.light(),
-      darkTheme: ThemeData.dark(),
+      theme: ThemeData.light(useMaterial3: true),
+      darkTheme: ThemeData.dark(useMaterial3: true),
       home: Scaffold(
         appBar: AppBar(
           title: const Text('Native Virtual Keyboard'),
-          backgroundColor: const Color.fromARGB(255, 135, 191, 237),
+          centerTitle: true,
         ),
-        body: Center(
-          child: Column(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text('Platform:'),
-                          const SizedBox(width: 6),
-                          DropdownButton<KeyboardPlatform?>(
-                            value: _selectedPlatform,
-                            items: [
-                              const DropdownMenuItem(
-                                value: null,
-                                child: Text('Auto-detect'),
-                              ),
-                              ...KeyboardPlatform.values.map(
-                                (e) => DropdownMenuItem(
-                                  value: e,
-                                  child: Text(e.name),
-                                ),
-                              ),
-                            ],
-                            onChanged: (value) =>
-                                setState(() => _selectedPlatform = value),
+        body: Column(
+          children: [
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.all(24),
+                children: [
+                  const Text(
+                    'Configuration',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Platform Selector
+                  InputDecorator(
+                    decoration: const InputDecoration(
+                      labelText: 'Simulated Platform',
+                      border: OutlineInputBorder(),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 4,
+                      ),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<KeyboardPlatform?>(
+                        value: _selectedPlatform,
+                        isExpanded: true,
+                        items: [
+                          const DropdownMenuItem(
+                            value: null,
+                            child: Text('Auto-detect (System Default)'),
+                          ),
+                          ...KeyboardPlatform.values.map(
+                            (e) =>
+                                DropdownMenuItem(value: e, child: Text(e.name)),
                           ),
                         ],
+                        onChanged: (value) =>
+                            setState(() => _selectedPlatform = value),
                       ),
-                      const SizedBox(height: 16),
-                      // Theme Controls
-                      SwitchListTile(
-                        title: const Text('Custom Colors (Red/Yellow/Orange)'),
-                        value: _customColors,
-                        onChanged: (value) {
-                          setState(() {
-                            _customColors = value;
-                          });
-                        },
-                      ),
-                      SwitchListTile(
-                        title: const Text('Custom Font (Serif/Bold)'),
-                        value: _customStyle,
-                        onChanged: (v) => setState(() => _customStyle = v),
-                      ),
-                      SwitchListTile(
-                        title: const Text('Show Enter Key'),
-                        value: _showEnter,
-                        onChanged: (v) => setState(() => _showEnter = v),
-                      ),
-                      SwitchListTile(
-                        title: const Text('Show Backspace Key'),
-                        value: _showBackspace,
-                        onChanged: (v) => setState(() => _showBackspace = v),
-                      ),
-                      SwitchListTile(
-                        title: const Text('Custom Overlay Color (Purple)'),
-                        value: _customOverlayColor,
-                        onChanged: (v) =>
-                            setState(() => _customOverlayColor = v),
-                      ),
-                      const SizedBox(height: 16),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 22),
-                        child: TextField(
-                          controller: _textController,
-                          readOnly: true,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'Input',
-                          ),
-                          minLines: 3,
-                          maxLines: 3,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 16),
+
+                  // Theme Toggle
+                  SwitchListTile(
+                    title: const Text('Use Custom Theme'),
+                    subtitle: const Text('Demonstrates full customization API'),
+                    value: _useCustomTheme,
+                    onChanged: (v) => setState(() => _useCustomTheme = v),
+                  ),
+
+                  // Key Toggles
+                  SwitchListTile(
+                    title: const Text('Show Enter Key'),
+                    value: _showEnter,
+                    onChanged: (v) => setState(() => _showEnter = v),
+                  ),
+                  SwitchListTile(
+                    title: const Text('Show Backspace Key'),
+                    value: _showBackspace,
+                    onChanged: (v) => setState(() => _showBackspace = v),
+                  ),
+
+                  const Divider(height: 32),
+
+                  // Text Input visualization
+                  TextField(
+                    controller: _textController,
+                    readOnly: true, // Prevent system keyboard
+                    autofocus: true,
+                    showCursor: true,
+                    decoration: const InputDecoration(
+                      labelText: 'Typed Text',
+                      hintText: 'Type using the virtual keyboard below...',
+                      border: OutlineInputBorder(),
+                      filled: true,
+                    ),
+                    minLines: 3,
+                    maxLines: 5,
+                    style: const TextStyle(fontSize: 18),
+                  ),
+                ],
               ),
-              VirtualKeyboard(
+            ),
+
+            // The Keyboard Widget
+            Container(
+              decoration: BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, -2),
+                  ),
+                ],
+              ),
+              child: VirtualKeyboard(
                 platform: _selectedPlatform,
-                // Custom colors
-                backgroundColor: _customColors ? Colors.red.shade100 : null,
-                keyBackgroundColor: _customColors
-                    ? Colors.yellow.shade200
-                    : null,
-                specialKeyBackgroundColor: _customColors
-                    ? Colors.orange.shade200
-                    : null,
-                keyIconColor: _customColors ? Colors.red : null,
+                // If _useCustomTheme is true, apply our custom "Midnight Blue" theme.
+                // Otherwise, pass null to let the widget use the native platform default.
+                theme: _useCustomTheme ? _customTheme : null,
 
                 showEnter: _showEnter,
                 showBackspace: _showBackspace,
-                // Custom Styles
-                keyTextStyle: _customStyle
-                    ? const TextStyle(
-                        color: Colors.blue,
-                        fontFamily: 'Serif',
-                        fontWeight: FontWeight.bold,
-                        fontStyle: FontStyle.italic,
-                      )
-                    : null,
-
-                // Custom overlay background color
-                overlayBackgroundColor: _customOverlayColor
-                    ? Colors.deepPurple.shade300
-                    : null,
-                // Custom overlay text color
-                overlayTextColor: _customOverlayColor ? Colors.white : null,
-
                 controller: VirtualKeyboardController(
                   layout: EnglishQwertyKeyboardLayout(),
                   onKeyPress: (key) {
                     final text = _textController.text;
+
                     if (key == VirtualKeyboardKey.backspace) {
                       if (text.isNotEmpty) {
                         _textController.text = text.substring(
@@ -177,8 +202,8 @@ class _MyAppState extends State<MyApp> {
                   },
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

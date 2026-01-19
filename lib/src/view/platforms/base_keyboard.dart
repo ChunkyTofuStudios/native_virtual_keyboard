@@ -17,35 +17,18 @@ typedef OverlayFollowerBuilder =
 
 abstract class BaseKeyboard extends StatefulWidget {
   final VirtualKeyboardController controller;
-  final Color? backgroundColor;
-  final Color? keyBackgroundColor;
-  final Color? keyIconColor;
-  final Color? specialKeyBackgroundColor;
-  final TextStyle? keyTextStyle;
+  final KeyboardTheme? theme;
   final bool showEnter;
   final bool showBackspace;
-  final List<BoxShadow>? keyShadow;
-  final List<BoxShadow>? keyInnerShadow;
   final double? specialKeyWidthMultiplier;
-  final Color? overlayBackgroundColor;
-  final Color? overlayTextColor;
 
   const BaseKeyboard({
     super.key,
     required this.controller,
-    this.backgroundColor,
-    this.keyBackgroundColor,
-    this.keyIconColor,
-    this.specialKeyBackgroundColor,
-    this.keyTextStyle,
-
+    this.theme,
     this.showEnter = true,
     this.showBackspace = true,
-    this.keyShadow,
-    this.keyInnerShadow,
     this.specialKeyWidthMultiplier,
-    this.overlayBackgroundColor,
-    this.overlayTextColor,
   });
 
   KeyboardTheme getTheme(Brightness brightness);
@@ -63,29 +46,10 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
 
   @override
   Widget build(BuildContext context) {
-    final defaultTheme = widget.getTheme(
-      MediaQuery.platformBrightnessOf(context),
-    );
-    // Apply overrides
-    final theme = defaultTheme.copyWith(
-      backgroundColor: widget.backgroundColor,
-      keyTheme: defaultTheme.keyTheme.copyWith(
-        backgroundColor: widget.keyBackgroundColor,
-        shadows: widget.keyShadow,
-        innerShadows: widget.keyInnerShadow,
-      ),
-      specialKeyTheme: defaultTheme.specialKeyTheme.copyWith(
-        backgroundColor: widget.specialKeyBackgroundColor,
-        foregroundColor: widget.keyIconColor,
-        shadows: widget
-            .keyShadow, // Apply same shadow to special keys for consistency
-        innerShadows:
-            null, // We don't apply inner shadow to special keys to match the system UI.
-      ),
-    );
+    final KeyboardTheme theme =
+        widget.theme ??
+        widget.getTheme(MediaQuery.platformBrightnessOf(context));
 
-    // Calculate effective text style for keys
-    final TextStyle? effectiveKeyTextStyle = widget.keyTextStyle;
     final dimensions = KeyboardDimensions.compute(
       widget.getDimensionsConfig(),
       MediaQuery.sizeOf(context).width,
@@ -155,9 +119,6 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
                           overlayFollowerBuilder: widget
                               .overlayFollowerBuilder(),
                           controller: widget.controller,
-                          keyTextStyle: effectiveKeyTextStyle,
-                          overlayBackgroundColor: widget.overlayBackgroundColor,
-                          overlayTextColor: widget.overlayTextColor,
                         ),
                       ),
                     ),
@@ -184,9 +145,6 @@ final class KeyParams {
   final AutoSizeGroup autoSizeGroup;
   final OverlayFollowerBuilder overlayFollowerBuilder;
   final VirtualKeyboardController controller;
-  final TextStyle? keyTextStyle;
-  final Color? overlayBackgroundColor;
-  final Color? overlayTextColor;
 
   const KeyParams({
     required this.key,
@@ -199,9 +157,6 @@ final class KeyParams {
     required this.autoSizeGroup,
     required this.overlayFollowerBuilder,
     required this.controller,
-    required this.keyTextStyle,
-    this.overlayBackgroundColor,
-    this.overlayTextColor,
   });
 }
 
@@ -375,11 +330,12 @@ class _KeyButton extends StatelessWidget {
   }
 
   Widget _buildKeyContent(BuildContext context) {
+    final keyTextStyle = data.theme.keyTheme.keyTextStyle;
     return AutoSizeText(
       data.key.text,
-      style: (data.controller.textTheme ?? data.keyTextStyle)
+      style: (data.controller.textTheme ?? keyTextStyle)
           ?.copyWith(color: _foregroundColor())
-          .merge(data.keyTextStyle),
+          .merge(keyTextStyle),
       minFontSize: 4,
       maxLines: 1,
       group: data.autoSizeGroup,
