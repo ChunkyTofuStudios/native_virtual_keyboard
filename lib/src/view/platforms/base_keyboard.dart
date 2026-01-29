@@ -21,7 +21,6 @@ abstract class BaseKeyboard extends StatefulWidget {
   final bool showEnter;
   final bool showBackspace;
   final double? specialKeyWidthMultiplier;
-  final Set<String> disabledKeys;
 
   const BaseKeyboard({
     super.key,
@@ -30,7 +29,6 @@ abstract class BaseKeyboard extends StatefulWidget {
     this.showEnter = true,
     this.showBackspace = true,
     this.specialKeyWidthMultiplier,
-    this.disabledKeys = const {},
   });
 
   KeyboardTheme getTheme(Brightness brightness);
@@ -58,10 +56,6 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
       widget.controller.layout,
       specialKeyWidthMultiplier: widget.specialKeyWidthMultiplier,
     );
-
-    final normalizedDisabledKeys = widget.disabledKeys
-        .map((e) => e.toLowerCase())
-        .toSet();
 
     return Container(
       decoration: BoxDecoration(
@@ -125,9 +119,9 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
                           overlayFollowerBuilder: widget
                               .overlayFollowerBuilder(),
                           controller: widget.controller,
-                          isDisabled: !key.special &&
-                              normalizedDisabledKeys
-                                  .contains(key.text.toLowerCase()),
+                          isDisabled:
+                              widget.controller.enabledKeys != null &&
+                              !widget.controller.enabledKeys!.contains(key),
                         ),
                       ),
                     ),
@@ -226,6 +220,12 @@ class _ActiveKeyState extends State<_ActiveKey> {
   Widget build(BuildContext context) {
     // Disabled keys are not interactive
     if (widget.data.isDisabled) {
+      // If the key becomes disabled while the overlay is showing (e.g. user was
+      // pressing it), we need to hide the overlay to prevent it from getting stuck.
+      if (widget.overlayController.isShowing) {
+        widget.overlayController.hide();
+      }
+
       return Padding(
         padding: widget.data.padding,
         child: _KeyButton(data: widget.data, isPressed: false),

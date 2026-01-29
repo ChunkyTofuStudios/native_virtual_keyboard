@@ -18,8 +18,15 @@ class _MyAppState extends State<MyApp> {
   bool _useCustomTheme = false;
   bool _showEnter = true;
   bool _showBackspace = true;
-  Set<String> _disabledKeys = {'Q', 'W', 'E'}; // Demo: disable some keys
-  bool _enableDisabledKeys = true;
+  Set<VirtualKeyboardKey> _enabledKeys = {
+    VirtualKeyboardKey.q,
+    VirtualKeyboardKey.w,
+    VirtualKeyboardKey.e,
+    VirtualKeyboardKey.r,
+    VirtualKeyboardKey.t,
+    VirtualKeyboardKey.y,
+  }; // Demo: only enable these keys
+  bool _restrictKeys = false;
 
   // Text controller
   final _textController = TextEditingController();
@@ -139,30 +146,32 @@ class _MyAppState extends State<MyApp> {
                     onChanged: (v) => setState(() => _showBackspace = v),
                   ),
                   SwitchListTile(
-                    title: const Text('Enable Disabled Keys Demo'),
+                    title: const Text('Restrict Enabled Keys'),
                     subtitle: Text(
-                      _enableDisabledKeys
-                          ? 'Keys disabled: ${_disabledKeys.join(", ")}'
+                      _restrictKeys
+                          ? 'Only these keys enabled: ${_enabledKeys.map((e) => e.text).join(", ")}'
                           : 'All keys enabled',
                     ),
-                    value: _enableDisabledKeys,
-                    onChanged: (v) => setState(() => _enableDisabledKeys = v),
+                    value: _restrictKeys,
+                    onChanged: (v) => setState(() => _restrictKeys = v),
                   ),
-                  if (_enableDisabledKeys)
+                  if (_restrictKeys)
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: TextField(
                         decoration: const InputDecoration(
-                          labelText: 'Disabled Keys',
-                          hintText: 'Enter letters to disable (e.g. ABC)',
+                          labelText: 'Enabled Keys (Whitelist)',
+                          hintText: 'Enter letters to enable (e.g. QWERTY)',
                           border: OutlineInputBorder(),
                         ),
                         onChanged: (value) {
                           setState(() {
-                            _disabledKeys = value
-                                .toUpperCase()
+                            _enabledKeys = value
                                 .split('')
-                                .where((c) => c.trim().isNotEmpty)
+                                .map(
+                                  (char) => VirtualKeyboardKey.fromChar(char),
+                                )
+                                .whereType<VirtualKeyboardKey>()
                                 .toSet();
                           });
                         },
@@ -210,8 +219,8 @@ class _MyAppState extends State<MyApp> {
 
                 showEnter: _showEnter,
                 showBackspace: _showBackspace,
-                disabledKeys: _enableDisabledKeys ? _disabledKeys : {},
                 controller: VirtualKeyboardController(
+                  enabledKeys: _restrictKeys ? _enabledKeys : null,
                   layout: EnglishQwertyKeyboardLayout(),
                   onKeyPress: (key) {
                     final text = _textController.text;
