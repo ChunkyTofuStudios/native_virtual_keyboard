@@ -69,6 +69,14 @@ final class KeyboardKeyTheme {
   /// The color of the text/icon.
   final Color foregroundColor;
 
+  /// The background color of the keys when they are disabled.
+  /// If null, defaults to [backgroundColor] with 40% opacity.
+  final Color? disabledBackgroundColor;
+
+  /// The color of the text/icon when the key is disabled.
+  /// If null, defaults to [foregroundColor] with 40% opacity.
+  final Color? disabledForegroundColor;
+
   /// The shadows of the keys.
   final List<BoxShadow>? shadows;
 
@@ -88,6 +96,8 @@ final class KeyboardKeyTheme {
     required this.backgroundColor,
     required this.pressedBackgroundColor,
     required this.foregroundColor,
+    this.disabledBackgroundColor,
+    this.disabledForegroundColor,
     this.shadows,
     this.innerShadows,
     this.overlayBackgroundColor,
@@ -99,6 +109,8 @@ final class KeyboardKeyTheme {
     Color? backgroundColor,
     Color? pressedBackgroundColor,
     Color? foregroundColor,
+    Color? disabledBackgroundColor,
+    Color? disabledForegroundColor,
     List<BoxShadow>? shadows,
     List<BoxShadow>? innerShadows,
     Color? overlayBackgroundColor,
@@ -110,6 +122,10 @@ final class KeyboardKeyTheme {
       pressedBackgroundColor:
           pressedBackgroundColor ?? this.pressedBackgroundColor,
       foregroundColor: foregroundColor ?? this.foregroundColor,
+      disabledBackgroundColor:
+          disabledBackgroundColor ?? this.disabledBackgroundColor,
+      disabledForegroundColor:
+          disabledForegroundColor ?? this.disabledForegroundColor,
       shadows: shadows ?? this.shadows,
       innerShadows: innerShadows ?? this.innerShadows,
       overlayBackgroundColor:
@@ -131,6 +147,8 @@ final class KeyboardSpecialKeyTheme extends KeyboardKeyTheme {
     required super.backgroundColor,
     required super.pressedBackgroundColor,
     required super.foregroundColor,
+    super.disabledBackgroundColor,
+    super.disabledForegroundColor,
     super.shadows,
     super.innerShadows,
     required this.pressedOverlayColor,
@@ -145,6 +163,8 @@ final class KeyboardSpecialKeyTheme extends KeyboardKeyTheme {
     Color? backgroundColor,
     Color? pressedBackgroundColor,
     Color? foregroundColor,
+    Color? disabledBackgroundColor,
+    Color? disabledForegroundColor,
     List<BoxShadow>? shadows,
     List<BoxShadow>? innerShadows,
     Color? pressedOverlayColor,
@@ -158,6 +178,10 @@ final class KeyboardSpecialKeyTheme extends KeyboardKeyTheme {
       pressedBackgroundColor:
           pressedBackgroundColor ?? this.pressedBackgroundColor,
       foregroundColor: foregroundColor ?? this.foregroundColor,
+      disabledBackgroundColor:
+          disabledBackgroundColor ?? this.disabledBackgroundColor,
+      disabledForegroundColor:
+          disabledForegroundColor ?? this.disabledForegroundColor,
       shadows: shadows ?? this.shadows,
       innerShadows: innerShadows ?? this.innerShadows,
       pressedOverlayColor: pressedOverlayColor ?? this.pressedOverlayColor,

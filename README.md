@@ -16,6 +16,7 @@ The original iOS 26 (Liquid Glass) keyboard on the left, the Flutter replica is 
     *   iOS 26 (Liquid Glass)
 *   **Automatic Detection:** Automatically selects the correct keyboard style based on the platform.
 *   **Theming API:** Powerful theming system to customize colors, shadows, and fonts.
+*   **Disabled Keys:** Ability to disable specific keys (visually dimmed and non-interactive).
 *   **Native Behavior:** Key tap animations, overlays, and sound effects matching native behavior.
 
 ## Usage
@@ -70,6 +71,26 @@ VirtualKeyboard(
   controller: ...,
 ),
 ```
+
+### Disabled Keys
+
+Disable specific keys to make them visually dimmed and non-interactive:
+
+```dart
+VirtualKeyboard(
+  disabledKeys: {'A', 'B', 'C'}, // Case-insensitive
+  controller: ...,
+),
+```
+
+Optionally customize disabled key appearance via theme:
+
+```dart
+KeyboardKeyTheme(
+  // ... required colors
+  disabledBackgroundColor: Colors.grey.shade300,
+  disabledForegroundColor: Colors.grey.shade500,
+)
 
 ## Getting Started
 

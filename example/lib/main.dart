@@ -18,6 +18,8 @@ class _MyAppState extends State<MyApp> {
   bool _useCustomTheme = false;
   bool _showEnter = true;
   bool _showBackspace = true;
+  Set<String> _disabledKeys = {'Q', 'W', 'E'}; // Demo: disable some keys
+  bool _enableDisabledKeys = true;
 
   // Text controller
   final _textController = TextEditingController();
@@ -136,6 +138,36 @@ class _MyAppState extends State<MyApp> {
                     value: _showBackspace,
                     onChanged: (v) => setState(() => _showBackspace = v),
                   ),
+                  SwitchListTile(
+                    title: const Text('Enable Disabled Keys Demo'),
+                    subtitle: Text(
+                      _enableDisabledKeys
+                          ? 'Keys disabled: ${_disabledKeys.join(", ")}'
+                          : 'All keys enabled',
+                    ),
+                    value: _enableDisabledKeys,
+                    onChanged: (v) => setState(() => _enableDisabledKeys = v),
+                  ),
+                  if (_enableDisabledKeys)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: TextField(
+                        decoration: const InputDecoration(
+                          labelText: 'Disabled Keys',
+                          hintText: 'Enter letters to disable (e.g. ABC)',
+                          border: OutlineInputBorder(),
+                        ),
+                        onChanged: (value) {
+                          setState(() {
+                            _disabledKeys = value
+                                .toUpperCase()
+                                .split('')
+                                .where((c) => c.trim().isNotEmpty)
+                                .toSet();
+                          });
+                        },
+                      ),
+                    ),
 
                   const Divider(height: 32),
 
@@ -178,6 +210,7 @@ class _MyAppState extends State<MyApp> {
 
                 showEnter: _showEnter,
                 showBackspace: _showBackspace,
+                disabledKeys: _enableDisabledKeys ? _disabledKeys : {},
                 controller: VirtualKeyboardController(
                   layout: EnglishQwertyKeyboardLayout(),
                   onKeyPress: (key) {

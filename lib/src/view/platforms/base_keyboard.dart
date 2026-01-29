@@ -21,6 +21,7 @@ abstract class BaseKeyboard extends StatefulWidget {
   final bool showEnter;
   final bool showBackspace;
   final double? specialKeyWidthMultiplier;
+  final Set<String> disabledKeys;
 
   const BaseKeyboard({
     super.key,
@@ -29,6 +30,7 @@ abstract class BaseKeyboard extends StatefulWidget {
     this.showEnter = true,
     this.showBackspace = true,
     this.specialKeyWidthMultiplier,
+    this.disabledKeys = const {},
   });
 
   KeyboardTheme getTheme(Brightness brightness);
@@ -56,6 +58,10 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
       widget.controller.layout,
       specialKeyWidthMultiplier: widget.specialKeyWidthMultiplier,
     );
+
+    final normalizedDisabledKeys = widget.disabledKeys
+        .map((e) => e.toLowerCase())
+        .toSet();
 
     return Container(
       decoration: BoxDecoration(
@@ -119,6 +125,9 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
                           overlayFollowerBuilder: widget
                               .overlayFollowerBuilder(),
                           controller: widget.controller,
+                          isDisabled: !key.special &&
+                              normalizedDisabledKeys
+                                  .contains(key.text.toLowerCase()),
                         ),
                       ),
                     ),
@@ -145,6 +154,7 @@ final class KeyParams {
   final AutoSizeGroup autoSizeGroup;
   final OverlayFollowerBuilder overlayFollowerBuilder;
   final VirtualKeyboardController controller;
+  final bool isDisabled;
 
   const KeyParams({
     required this.key,
@@ -157,6 +167,7 @@ final class KeyParams {
     required this.autoSizeGroup,
     required this.overlayFollowerBuilder,
     required this.controller,
+    this.isDisabled = false,
   });
 }
 
@@ -213,6 +224,14 @@ class _ActiveKeyState extends State<_ActiveKey> {
 
   @override
   Widget build(BuildContext context) {
+    // Disabled keys are not interactive
+    if (widget.data.isDisabled) {
+      return Padding(
+        padding: widget.data.padding,
+        child: _KeyButton(data: widget.data, isPressed: false),
+      );
+    }
+
     return InkWell(
       onTap: () => widget.data.controller.onKeyPress?.call(widget.data.key),
       onTapDown: (_) {
@@ -259,21 +278,33 @@ class _KeyButton extends StatelessWidget {
 
   const _KeyButton({required this.data, required this.isPressed});
 
-  Color _backgroundColor() => data.key.special
-      ? (isPressed
-            ? Color.alphaBlend(
-                data.theme.specialKeyTheme.pressedOverlayColor ??
-                    Colors.transparent,
-                data.theme.specialKeyTheme.pressedBackgroundColor,
-              )
-            : data.theme.specialKeyTheme.backgroundColor)
-      : (isPressed
-            ? data.theme.keyTheme.pressedBackgroundColor
-            : data.theme.keyTheme.backgroundColor);
+  Color _backgroundColor() {
+    if (data.isDisabled) {
+      return data.theme.keyTheme.disabledBackgroundColor ??
+          data.theme.keyTheme.backgroundColor.withValues(alpha: 0.4);
+    }
+    return data.key.special
+        ? (isPressed
+              ? Color.alphaBlend(
+                  data.theme.specialKeyTheme.pressedOverlayColor ??
+                      Colors.transparent,
+                  data.theme.specialKeyTheme.pressedBackgroundColor,
+                )
+              : data.theme.specialKeyTheme.backgroundColor)
+        : (isPressed
+              ? data.theme.keyTheme.pressedBackgroundColor
+              : data.theme.keyTheme.backgroundColor);
+  }
 
-  Color _foregroundColor() => data.key.special
-      ? data.theme.specialKeyTheme.foregroundColor
-      : data.theme.keyTheme.foregroundColor;
+  Color _foregroundColor() {
+    if (data.isDisabled) {
+      return data.theme.keyTheme.disabledForegroundColor ??
+          data.theme.keyTheme.foregroundColor.withValues(alpha: 0.4);
+    }
+    return data.key.special
+        ? data.theme.specialKeyTheme.foregroundColor
+        : data.theme.keyTheme.foregroundColor;
+  }
 
   List<BoxShadow>? _shadows() => data.key.special
       ? data.theme.specialKeyTheme.shadows

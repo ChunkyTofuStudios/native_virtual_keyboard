@@ -46,6 +46,11 @@ final class VirtualKeyboard extends StatelessWidget {
   /// Whether to show the backspace key.
   final bool showBackspace;
 
+  /// A set of characters (case-insensitive) that should be disabled.
+  /// Disabled keys are visually dimmed and do not respond to user input.
+  /// Example: `{'A', 'B', 'C'}` or `{'a', 'b', 'c'}` will disable those keys.
+  final Set<String> disabledKeys;
+
   const VirtualKeyboard({
     super.key,
     required this.controller,
@@ -54,6 +59,7 @@ final class VirtualKeyboard extends StatelessWidget {
     this.specialKeyWidthMultiplier,
     this.showEnter = true,
     this.showBackspace = true,
+    this.disabledKeys = const {},
   });
 
   @override
@@ -75,6 +81,7 @@ final class VirtualKeyboard extends StatelessWidget {
             showEnter: showEnter,
             showBackspace: showBackspace,
             specialKeyWidthMultiplier: specialKeyWidthMultiplier,
+            disabledKeys: disabledKeys,
           ),
           KeyboardPlatform.ios18 => Ios18Keyboard(
             controller: controller,
@@ -82,6 +89,7 @@ final class VirtualKeyboard extends StatelessWidget {
             showEnter: showEnter,
             showBackspace: showBackspace,
             specialKeyWidthMultiplier: specialKeyWidthMultiplier,
+            disabledKeys: disabledKeys,
           ),
           KeyboardPlatform.ios26 => Ios26Keyboard(
             controller: controller,
@@ -89,6 +97,7 @@ final class VirtualKeyboard extends StatelessWidget {
             showEnter: showEnter,
             showBackspace: showBackspace,
             specialKeyWidthMultiplier: specialKeyWidthMultiplier,
+            disabledKeys: disabledKeys,
           ),
         };
       },
