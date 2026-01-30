@@ -25,6 +25,11 @@ final class VirtualKeyboardController {
   /// Synonimous with [onPressed].
   final KeyInteractionCallback? onKeyPress;
 
+  /// The keys that are enabled.
+  /// If null, all keys are enabled.
+  /// If provided, only the keys in this set are enabled. Other keys will be disabled.
+  final Set<VirtualKeyboardKey>? enabledKeys;
+
   const VirtualKeyboardController({
     required this.layout,
     this.textTheme,
@@ -32,5 +37,6 @@ final class VirtualKeyboardController {
     this.onKeyDown,
     this.onKeyUp,
     required this.onKeyPress,
+    this.enabledKeys,
   });
 }
