@@ -1,3 +1,7 @@
+## 0.2.3
+
+* Allow enabling/disabling keys
+
 ## 0.2.2
 
 * Simplify theme customization
