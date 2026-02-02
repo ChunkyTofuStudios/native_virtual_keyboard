@@ -18,6 +18,15 @@ class _MyAppState extends State<MyApp> {
   bool _useCustomTheme = false;
   bool _showEnter = true;
   bool _showBackspace = true;
+  Set<VirtualKeyboardKey> _enabledKeys = {
+    VirtualKeyboardKey.q,
+    VirtualKeyboardKey.w,
+    VirtualKeyboardKey.e,
+    VirtualKeyboardKey.r,
+    VirtualKeyboardKey.t,
+    VirtualKeyboardKey.y,
+  }; // Demo: only enable these keys
+  bool _restrictKeys = false;
 
   // Text controller
   final _textController = TextEditingController();
@@ -136,6 +145,38 @@ class _MyAppState extends State<MyApp> {
                     value: _showBackspace,
                     onChanged: (v) => setState(() => _showBackspace = v),
                   ),
+                  SwitchListTile(
+                    title: const Text('Restrict Enabled Keys'),
+                    subtitle: Text(
+                      _restrictKeys
+                          ? 'Only these keys enabled: ${_enabledKeys.map((e) => e.text).join(", ")}'
+                          : 'All keys enabled',
+                    ),
+                    value: _restrictKeys,
+                    onChanged: (v) => setState(() => _restrictKeys = v),
+                  ),
+                  if (_restrictKeys)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: TextField(
+                        decoration: const InputDecoration(
+                          labelText: 'Enabled Keys (Whitelist)',
+                          hintText: 'Enter letters to enable (e.g. QWERTY)',
+                          border: OutlineInputBorder(),
+                        ),
+                        onChanged: (value) {
+                          setState(() {
+                            _enabledKeys = value
+                                .split('')
+                                .map(
+                                  (char) => VirtualKeyboardKey.fromChar(char),
+                                )
+                                .whereType<VirtualKeyboardKey>()
+                                .toSet();
+                          });
+                        },
+                      ),
+                    ),
 
                   const Divider(height: 32),
 
@@ -179,6 +220,7 @@ class _MyAppState extends State<MyApp> {
                 showEnter: _showEnter,
                 showBackspace: _showBackspace,
                 controller: VirtualKeyboardController(
+                  enabledKeys: _restrictKeys ? _enabledKeys : null,
                   layout: EnglishQwertyKeyboardLayout(),
                   onKeyPress: (key) {
                     final text = _textController.text;
