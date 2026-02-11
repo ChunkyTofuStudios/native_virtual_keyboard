@@ -28,15 +28,19 @@ final class VirtualKeyboardController {
   /// The keys that are enabled.
   /// If null, all keys are enabled.
   /// If provided, only the keys in this set are enabled. Other keys will be disabled.
-  final Set<VirtualKeyboardKey>? enabledKeys;
+  final ValueNotifier<Set<VirtualKeyboardKey>?> enabledKeys;
 
-  const VirtualKeyboardController({
+  VirtualKeyboardController({
     required this.layout,
     this.textTheme,
     this.overlayTextTheme,
     this.onKeyDown,
     this.onKeyUp,
     required this.onKeyPress,
-    this.enabledKeys,
-  });
+    Set<VirtualKeyboardKey>? enabledKeys,
+  }) : enabledKeys = ValueNotifier(enabledKeys);
+
+  void setEnabledKeys(Set<VirtualKeyboardKey> enabledKeys) {
+    this.enabledKeys.value = enabledKeys;
+  }
 }

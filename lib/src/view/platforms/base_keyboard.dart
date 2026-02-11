@@ -99,29 +99,33 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
                       maintainSize: true,
                       maintainAnimation: true,
                       maintainState: true,
-                      child: _Key(
-                        data: KeyParams(
-                          key: key,
-                          size: key.special
-                              ? dimensions.keyDimensions.specialSize
-                              : dimensions.keyDimensions.size,
-                          borderRadius: dimensions.keyDimensions.borderRadius,
-                          elevation: dimensions.keyDimensions.elevation,
-                          overlaySize: dimensions.keyDimensions.overlaySize,
-                          padding: EdgeInsets.symmetric(
-                            horizontal:
-                                dimensions.keyDimensions.horizontalSpacing / 2,
-                            vertical:
-                                dimensions.keyDimensions.verticalSpacing / 2,
+                      child: ValueListenableBuilder(
+                        valueListenable: widget.controller.enabledKeys,
+                        builder: (context, enabledKeys, child) => _Key(
+                          data: KeyParams(
+                            key: key,
+                            size: key.special
+                                ? dimensions.keyDimensions.specialSize
+                                : dimensions.keyDimensions.size,
+                            borderRadius: dimensions.keyDimensions.borderRadius,
+                            elevation: dimensions.keyDimensions.elevation,
+                            overlaySize: dimensions.keyDimensions.overlaySize,
+                            padding: EdgeInsets.symmetric(
+                              horizontal:
+                                  dimensions.keyDimensions.horizontalSpacing /
+                                  2,
+                              vertical:
+                                  dimensions.keyDimensions.verticalSpacing / 2,
+                            ),
+                            theme: theme,
+                            autoSizeGroup: _autoSizeGroup,
+                            overlayFollowerBuilder: widget
+                                .overlayFollowerBuilder(),
+                            controller: widget.controller,
+                            isDisabled:
+                                enabledKeys != null &&
+                                !enabledKeys.contains(key),
                           ),
-                          theme: theme,
-                          autoSizeGroup: _autoSizeGroup,
-                          overlayFollowerBuilder: widget
-                              .overlayFollowerBuilder(),
-                          controller: widget.controller,
-                          isDisabled:
-                              widget.controller.enabledKeys != null &&
-                              !widget.controller.enabledKeys!.contains(key),
                         ),
                       ),
                     ),

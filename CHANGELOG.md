@@ -1,3 +1,7 @@
+## 0.2.4
+
+* Allow changing enabledKeys via ValueNotifier
+
 ## 0.2.3
 
 * Allow enabling/disabling keys
