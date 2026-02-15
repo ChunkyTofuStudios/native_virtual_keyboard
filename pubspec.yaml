@@ -1,6 +1,6 @@
 name: native_virtual_keyboard
 description: "An almost pixel perfect Flutter replica of iOS and Android native keyboards."
-version: 0.2.4
+version: 0.2.5
 homepage: https://chunkytofustudios.com
 repository: https://github.com/ChunkyTofuStudios/native_virtual_keyboard
 

@@ -1,3 +1,7 @@
+## 0.2.5
+
+* setEnabledKeys accepts null argument
+
 ## 0.2.4
 
 * Allow changing enabledKeys via ValueNotifier

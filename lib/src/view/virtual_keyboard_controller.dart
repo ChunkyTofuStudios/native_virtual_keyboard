@@ -40,7 +40,9 @@ final class VirtualKeyboardController {
     Set<VirtualKeyboardKey>? enabledKeys,
   }) : enabledKeys = ValueNotifier(enabledKeys);
 
-  void setEnabledKeys(Set<VirtualKeyboardKey> enabledKeys) {
+  /// Change the keys that are enabled.
+  /// If null, all keys are enabled.
+  void setEnabledKeys(Set<VirtualKeyboardKey>? enabledKeys) {
     this.enabledKeys.value = enabledKeys;
   }
 }
