@@ -77,13 +77,21 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
     final animConfig = widget.animationConfig;
     final layout = widget.controller.layout.layout;
 
-    // Pre-compute flat indices for stagger calculations.
-    // Map of (rowIndex, colIndex) -> flatIndex
+    // Pre-compute flat and stagger indices once per build, outside
+    // ValueListenableBuilder, since they depend only on position.
     final flatIndices = <(int, int), int>{};
+    final staggerIndices = <(int, int), int>{};
     var counter = 0;
     for (var r = 0; r < layout.length; r++) {
       for (var c = 0; c < layout[r].length; c++) {
-        flatIndices[(r, c)] = counter++;
+        final flatIndex = counter++;
+        flatIndices[(r, c)] = flatIndex;
+        staggerIndices[(r, c)] = _computeStaggerIndex(
+          animConfig,
+          r,
+          c,
+          flatIndex,
+        );
       }
     }
 
@@ -132,13 +140,8 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
                       child: ValueListenableBuilder(
                         valueListenable: widget.controller.enabledKeys,
                         builder: (context, enabledKeys, child) {
-                          final staggerIdx = _computeStaggerIndex(
-                            animConfig,
-                            rowIndex,
-                            colIndex,
-                            flatIndices[(rowIndex, colIndex)]!,
-                          );
                           return _Key(
+                            key: ValueKey(key),
                             data: KeyParams(
                               key: key,
                               size: key.special
@@ -164,7 +167,7 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
                                   enabledKeys != null &&
                                   !enabledKeys.contains(key),
                               animationConfig: animConfig,
-                              staggerIndex: staggerIdx,
+                              staggerIndex: staggerIndices[(rowIndex, colIndex)]!,
                             ),
                           );
                         },
@@ -214,7 +217,11 @@ final class KeyParams {
     this.staggerIndex = 0,
   });
 
-  KeyParams copyWith({bool? isDisabled}) {
+  /// Creates a copy with a different [isDisabled] value.
+  ///
+  /// Only this field is supported because [KeyParams] is internal
+  /// and only the disabled state changes at runtime.
+  KeyParams withDisabled(bool isDisabled) {
     return KeyParams(
       key: key,
       size: size,
@@ -226,7 +233,7 @@ final class KeyParams {
       autoSizeGroup: autoSizeGroup,
       overlayFollowerBuilder: overlayFollowerBuilder,
       controller: controller,
-      isDisabled: isDisabled ?? this.isDisabled,
+      isDisabled: isDisabled,
       animationConfig: animationConfig,
       staggerIndex: staggerIndex,
     );
@@ -236,7 +243,7 @@ final class KeyParams {
 class _Key extends StatefulWidget {
   final KeyParams data;
 
-  const _Key({required this.data});
+  const _Key({super.key, required this.data});
 
   @override
   State<_Key> createState() => _KeyState();
@@ -248,8 +255,11 @@ class _KeyState extends State<_Key> {
 
   /// The effective disabled state, which may be delayed for staggered animations
   /// so that the key retains its normal appearance until its turn arrives.
+  ///
+  /// Both the visual appearance (opacity) and the interactive state are derived
+  /// from this single source of truth, ensuring they stay in sync.
   late bool _effectiveDisabled;
-  Timer? _disabledDelayTimer;
+  Timer? _staggerDelayTimer;
 
   @override
   void initState() {
@@ -261,7 +271,7 @@ class _KeyState extends State<_Key> {
   void didUpdateWidget(_Key oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.data.isDisabled != widget.data.isDisabled) {
-      _disabledDelayTimer?.cancel();
+      _staggerDelayTimer?.cancel();
       final config = widget.data.animationConfig;
       final delay = (config != null && config.staggered)
           ? config.staggerDelay * widget.data.staggerIndex
@@ -270,7 +280,7 @@ class _KeyState extends State<_Key> {
       if (delay == Duration.zero) {
         _effectiveDisabled = widget.data.isDisabled;
       } else {
-        _disabledDelayTimer = Timer(delay, () {
+        _staggerDelayTimer = Timer(delay, () {
           if (mounted) {
             setState(() {
               _effectiveDisabled = widget.data.isDisabled;
@@ -283,7 +293,7 @@ class _KeyState extends State<_Key> {
 
   @override
   void dispose() {
-    _disabledDelayTimer?.cancel();
+    _staggerDelayTimer?.cancel();
     super.dispose();
   }
 
@@ -291,9 +301,13 @@ class _KeyState extends State<_Key> {
   Widget build(BuildContext context) {
     final effectiveData = _effectiveDisabled == widget.data.isDisabled
         ? widget.data
-        : widget.data.copyWith(isDisabled: _effectiveDisabled);
+        : widget.data.withDisabled(_effectiveDisabled);
 
-    final child = CompositedTransformTarget(
+    // CR-9: Block taps immediately when the real state is disabled,
+    // even if the stagger delay hasn't elapsed yet.
+    final blockTaps = widget.data.isDisabled && !_effectiveDisabled;
+
+    Widget child = CompositedTransformTarget(
       link: _overlayLayerLink,
       child: OverlayPortal(
         controller: _overlayController,
@@ -314,27 +328,23 @@ class _KeyState extends State<_Key> {
       ),
     );
 
+    if (blockTaps) {
+      child = IgnorePointer(child: child);
+    }
+
     final config = widget.data.animationConfig;
     if (config == null) return child;
 
+    // Opacity is computed from _effectiveDisabled (the single source of truth)
+    // so it stays in sync with the interactive state.
     final disabledOpacity =
         widget.data.theme.keyTheme.disabledBackgroundColor != null ? 1.0 : 0.4;
-    final targetOpacity = widget.data.isDisabled ? disabledOpacity : 1.0;
+    final targetOpacity = _effectiveDisabled ? disabledOpacity : 1.0;
 
-    if (!config.staggered) {
-      return AnimatedOpacity(
-        opacity: targetOpacity,
-        duration: config.duration,
-        curve: config.curve,
-        child: child,
-      );
-    }
-
-    return _DelayedAnimatedOpacity(
+    return AnimatedOpacity(
       opacity: targetOpacity,
       duration: config.duration,
       curve: config.curve,
-      delay: config.staggerDelay * widget.data.staggerIndex,
       child: child,
     );
   }
@@ -511,70 +521,3 @@ class _KeyButton extends StatelessWidget {
   }
 }
 
-class _DelayedAnimatedOpacity extends StatefulWidget {
-  final double opacity;
-  final Duration duration;
-  final Curve curve;
-  final Duration delay;
-  final Widget child;
-
-  const _DelayedAnimatedOpacity({
-    required this.opacity,
-    required this.duration,
-    required this.curve,
-    required this.delay,
-    required this.child,
-  });
-
-  @override
-  State<_DelayedAnimatedOpacity> createState() =>
-      _DelayedAnimatedOpacityState();
-}
-
-class _DelayedAnimatedOpacityState extends State<_DelayedAnimatedOpacity> {
-  late double _currentOpacity;
-  Timer? _delayTimer;
-
-  @override
-  void initState() {
-    super.initState();
-    _currentOpacity = widget.opacity;
-  }
-
-  @override
-  void didUpdateWidget(_DelayedAnimatedOpacity oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.opacity != widget.opacity) {
-      _delayTimer?.cancel();
-      if (widget.delay == Duration.zero) {
-        setState(() {
-          _currentOpacity = widget.opacity;
-        });
-      } else {
-        _delayTimer = Timer(widget.delay, () {
-          if (mounted) {
-            setState(() {
-              _currentOpacity = widget.opacity;
-            });
-          }
-        });
-      }
-    }
-  }
-
-  @override
-  void dispose() {
-    _delayTimer?.cancel();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedOpacity(
-      opacity: _currentOpacity,
-      duration: widget.duration,
-      curve: widget.curve,
-      child: widget.child,
-    );
-  }
-}

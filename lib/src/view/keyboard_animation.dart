@@ -14,6 +14,7 @@ enum StaggerPattern {
 ///
 /// When provided to [VirtualKeyboard], keys will animate their opacity
 /// when transitioning between enabled and disabled states.
+@immutable
 class KeyboardAnimationConfig {
   /// Duration of the fade animation.
   final Duration duration;
@@ -40,4 +41,24 @@ class KeyboardAnimationConfig {
   });
 
   static const defaultConfig = KeyboardAnimationConfig();
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is KeyboardAnimationConfig &&
+          runtimeType == other.runtimeType &&
+          duration == other.duration &&
+          curve == other.curve &&
+          staggered == other.staggered &&
+          staggerDelay == other.staggerDelay &&
+          staggerPattern == other.staggerPattern;
+
+  @override
+  int get hashCode => Object.hash(
+        duration,
+        curve,
+        staggered,
+        staggerDelay,
+        staggerPattern,
+      );
 }

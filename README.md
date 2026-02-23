@@ -104,14 +104,29 @@ KeyboardKeyTheme(
 
 ### Animations
 
-You can animate the transition between enabled and disabled states by providing a `KeyboardAnimationConfig`. It supports simultaneous and staggered animations:
+You can animate the transition between enabled and disabled states by providing a `KeyboardAnimationConfig`. Use `KeyboardAnimationConfig.defaultConfig` for sensible defaults, or customize it:
+
+**Simultaneous** — all keys animate together:
 
 ```dart
 VirtualKeyboard(
   controller: ...,
   animationConfig: const KeyboardAnimationConfig(
     duration: Duration(milliseconds: 300),
-    staggered: true, 
+    curve: Curves.easeInOut,
+  ),
+),
+```
+
+**Staggered** — keys animate with a positional delay, creating a wave effect:
+
+```dart
+VirtualKeyboard(
+  controller: ...,
+  animationConfig: const KeyboardAnimationConfig(
+    duration: Duration(milliseconds: 300),
+    curve: Curves.easeInOut,
+    staggered: true,
     staggerDelay: Duration(milliseconds: 50),
     staggerPattern: StaggerPattern.diagonal, // or StaggerPattern.sequential
   ),
