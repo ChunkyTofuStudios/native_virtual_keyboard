@@ -18,6 +18,7 @@ The original iOS 26 (Liquid Glass) keyboard on the left, the Flutter replica is 
 *   **Theming API:** Powerful theming system to customize colors, shadows, and fonts.
 *   **Key Interaction:** Whitelist support to enable specific keys while disabling others (visually dimmed and non-interactive).
 *   **Native Behavior:** Key tap animations, overlays, and sound effects matching native behavior.
+*   **Animations:** Configurable fade and staggered layout animations for key state transitions.
 
 ## Usage
 
@@ -99,6 +100,23 @@ KeyboardKeyTheme(
   disabledBackgroundColor: Colors.grey.shade300,
   disabledForegroundColor: Colors.grey.shade500,
 )
+```
+
+### Animations
+
+You can animate the transition between enabled and disabled states by providing a `KeyboardAnimationConfig`. It supports simultaneous and staggered animations:
+
+```dart
+VirtualKeyboard(
+  controller: ...,
+  animationConfig: const KeyboardAnimationConfig(
+    duration: Duration(milliseconds: 300),
+    staggered: true, 
+    staggerDelay: Duration(milliseconds: 50),
+    staggerPattern: StaggerPattern.diagonal, // or StaggerPattern.sequential
+  ),
+),
+```
 
 ## Getting Started
 
