@@ -213,6 +213,24 @@ final class KeyParams {
     this.animationConfig,
     this.staggerIndex = 0,
   });
+
+  KeyParams copyWith({bool? isDisabled}) {
+    return KeyParams(
+      key: key,
+      size: size,
+      borderRadius: borderRadius,
+      elevation: elevation,
+      overlaySize: overlaySize,
+      padding: padding,
+      theme: theme,
+      autoSizeGroup: autoSizeGroup,
+      overlayFollowerBuilder: overlayFollowerBuilder,
+      controller: controller,
+      isDisabled: isDisabled ?? this.isDisabled,
+      animationConfig: animationConfig,
+      staggerIndex: staggerIndex,
+    );
+  }
 }
 
 class _Key extends StatefulWidget {
@@ -228,8 +246,53 @@ class _KeyState extends State<_Key> {
   final OverlayPortalController _overlayController = OverlayPortalController();
   final LayerLink _overlayLayerLink = LayerLink();
 
+  /// The effective disabled state, which may be delayed for staggered animations
+  /// so that the key retains its normal appearance until its turn arrives.
+  late bool _effectiveDisabled;
+  Timer? _disabledDelayTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _effectiveDisabled = widget.data.isDisabled;
+  }
+
+  @override
+  void didUpdateWidget(_Key oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.data.isDisabled != widget.data.isDisabled) {
+      _disabledDelayTimer?.cancel();
+      final config = widget.data.animationConfig;
+      final delay = (config != null && config.staggered)
+          ? config.staggerDelay * widget.data.staggerIndex
+          : Duration.zero;
+
+      if (delay == Duration.zero) {
+        _effectiveDisabled = widget.data.isDisabled;
+      } else {
+        _disabledDelayTimer = Timer(delay, () {
+          if (mounted) {
+            setState(() {
+              _effectiveDisabled = widget.data.isDisabled;
+            });
+          }
+        });
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _disabledDelayTimer?.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final effectiveData = _effectiveDisabled == widget.data.isDisabled
+        ? widget.data
+        : widget.data.copyWith(isDisabled: _effectiveDisabled);
+
     final child = CompositedTransformTarget(
       link: _overlayLayerLink,
       child: OverlayPortal(
@@ -245,7 +308,7 @@ class _KeyState extends State<_Key> {
           ),
         ),
         child: _ActiveKey(
-          data: widget.data,
+          data: effectiveData,
           overlayController: _overlayController,
         ),
       ),
