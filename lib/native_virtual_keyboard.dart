@@ -1,6 +1,7 @@
 library;
 
 export 'src/model/virtual_keyboard_key.dart';
+export 'src/view/keyboard_animation.dart';
 export 'src/view/keyboard_layout.dart';
 export 'src/view/keyboard_platform.dart';
 export 'src/view/keyboard_theme.dart';

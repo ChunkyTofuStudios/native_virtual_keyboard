@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:native_virtual_keyboard/src/model/virtual_keyboard_key.dart';
 import 'package:native_virtual_keyboard/src/view/inner_shadow_painter.dart';
+import 'package:native_virtual_keyboard/src/view/keyboard_animation.dart';
 import 'package:native_virtual_keyboard/src/view/keyboard_dimensions.dart';
 import 'package:native_virtual_keyboard/src/view/keyboard_theme.dart';
 import 'package:native_virtual_keyboard/src/view/virtual_keyboard_controller.dart';
@@ -21,6 +23,7 @@ abstract class BaseKeyboard extends StatefulWidget {
   final bool showEnter;
   final bool showBackspace;
   final double? specialKeyWidthMultiplier;
+  final KeyboardAnimationConfig? animationConfig;
 
   const BaseKeyboard({
     super.key,
@@ -29,6 +32,7 @@ abstract class BaseKeyboard extends StatefulWidget {
     this.showEnter = true,
     this.showBackspace = true,
     this.specialKeyWidthMultiplier,
+    this.animationConfig,
   });
 
   KeyboardTheme getTheme(Brightness brightness);
@@ -44,6 +48,19 @@ abstract class BaseKeyboard extends StatefulWidget {
 class _BaseKeyboardState extends State<BaseKeyboard> {
   final AutoSizeGroup _autoSizeGroup = AutoSizeGroup();
 
+  static int _computeStaggerIndex(
+    KeyboardAnimationConfig? config,
+    int rowIndex,
+    int colIndex,
+    int flatIndex,
+  ) {
+    if (config == null || !config.staggered) return 0;
+    return switch (config.staggerPattern) {
+      StaggerPattern.sequential => flatIndex,
+      StaggerPattern.diagonal => rowIndex + colIndex,
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     final KeyboardTheme theme =
@@ -56,6 +73,19 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
       widget.controller.layout,
       specialKeyWidthMultiplier: widget.specialKeyWidthMultiplier,
     );
+
+    final animConfig = widget.animationConfig;
+    final layout = widget.controller.layout.layout;
+
+    // Pre-compute flat indices for stagger calculations.
+    // Map of (rowIndex, colIndex) -> flatIndex
+    final flatIndices = <(int, int), int>{};
+    var counter = 0;
+    for (var r = 0; r < layout.length; r++) {
+      for (var c = 0; c < layout[r].length; c++) {
+        flatIndices[(r, c)] = counter++;
+      }
+    }
 
     return Container(
       decoration: BoxDecoration(
@@ -84,12 +114,12 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
                     dimensions.keyDimensions.verticalSpacing / 2,
               ),
             ),
-            for (final row in widget.controller.layout.layout)
+            for (final (rowIndex, row) in layout.indexed)
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  for (final (index, key) in row.indexed) ...[
-                    if (key.special && index > 0) const Spacer(),
+                  for (final (colIndex, key) in row.indexed) ...[
+                    if (key.special && colIndex > 0) const Spacer(),
                     Visibility(
                       visible:
                           !((key == VirtualKeyboardKey.enter &&
@@ -101,35 +131,47 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
                       maintainState: true,
                       child: ValueListenableBuilder(
                         valueListenable: widget.controller.enabledKeys,
-                        builder: (context, enabledKeys, child) => _Key(
-                          data: KeyParams(
-                            key: key,
-                            size: key.special
-                                ? dimensions.keyDimensions.specialSize
-                                : dimensions.keyDimensions.size,
-                            borderRadius: dimensions.keyDimensions.borderRadius,
-                            elevation: dimensions.keyDimensions.elevation,
-                            overlaySize: dimensions.keyDimensions.overlaySize,
-                            padding: EdgeInsets.symmetric(
-                              horizontal:
-                                  dimensions.keyDimensions.horizontalSpacing /
-                                  2,
-                              vertical:
-                                  dimensions.keyDimensions.verticalSpacing / 2,
+                        builder: (context, enabledKeys, child) {
+                          final staggerIdx = _computeStaggerIndex(
+                            animConfig,
+                            rowIndex,
+                            colIndex,
+                            flatIndices[(rowIndex, colIndex)]!,
+                          );
+                          return _Key(
+                            data: KeyParams(
+                              key: key,
+                              size: key.special
+                                  ? dimensions.keyDimensions.specialSize
+                                  : dimensions.keyDimensions.size,
+                              borderRadius:
+                                  dimensions.keyDimensions.borderRadius,
+                              elevation: dimensions.keyDimensions.elevation,
+                              overlaySize: dimensions.keyDimensions.overlaySize,
+                              padding: EdgeInsets.symmetric(
+                                horizontal:
+                                    dimensions.keyDimensions.horizontalSpacing /
+                                    2,
+                                vertical:
+                                    dimensions.keyDimensions.verticalSpacing / 2,
+                              ),
+                              theme: theme,
+                              autoSizeGroup: _autoSizeGroup,
+                              overlayFollowerBuilder: widget
+                                  .overlayFollowerBuilder(),
+                              controller: widget.controller,
+                              isDisabled:
+                                  enabledKeys != null &&
+                                  !enabledKeys.contains(key),
+                              animationConfig: animConfig,
+                              staggerIndex: staggerIdx,
                             ),
-                            theme: theme,
-                            autoSizeGroup: _autoSizeGroup,
-                            overlayFollowerBuilder: widget
-                                .overlayFollowerBuilder(),
-                            controller: widget.controller,
-                            isDisabled:
-                                enabledKeys != null &&
-                                !enabledKeys.contains(key),
-                          ),
-                        ),
+                          );
+                        },
                       ),
                     ),
-                    if (key.special && index < row.length - 1) const Spacer(),
+                    if (key.special && colIndex < row.length - 1)
+                      const Spacer(),
                   ],
                 ],
               ),
@@ -153,6 +195,8 @@ final class KeyParams {
   final OverlayFollowerBuilder overlayFollowerBuilder;
   final VirtualKeyboardController controller;
   final bool isDisabled;
+  final KeyboardAnimationConfig? animationConfig;
+  final int staggerIndex;
 
   const KeyParams({
     required this.key,
@@ -166,6 +210,8 @@ final class KeyParams {
     required this.overlayFollowerBuilder,
     required this.controller,
     this.isDisabled = false,
+    this.animationConfig,
+    this.staggerIndex = 0,
   });
 }
 
@@ -184,7 +230,7 @@ class _KeyState extends State<_Key> {
 
   @override
   Widget build(BuildContext context) {
-    return CompositedTransformTarget(
+    final child = CompositedTransformTarget(
       link: _overlayLayerLink,
       child: OverlayPortal(
         controller: _overlayController,
@@ -203,6 +249,30 @@ class _KeyState extends State<_Key> {
           overlayController: _overlayController,
         ),
       ),
+    );
+
+    final config = widget.data.animationConfig;
+    if (config == null) return child;
+
+    final disabledOpacity =
+        widget.data.theme.keyTheme.disabledBackgroundColor != null ? 1.0 : 0.4;
+    final targetOpacity = widget.data.isDisabled ? disabledOpacity : 1.0;
+
+    if (!config.staggered) {
+      return AnimatedOpacity(
+        opacity: targetOpacity,
+        duration: config.duration,
+        curve: config.curve,
+        child: child,
+      );
+    }
+
+    return _DelayedAnimatedOpacity(
+      opacity: targetOpacity,
+      duration: config.duration,
+      curve: config.curve,
+      delay: config.staggerDelay * widget.data.staggerIndex,
+      child: child,
     );
   }
 }
@@ -374,6 +444,74 @@ class _KeyButton extends StatelessWidget {
       minFontSize: 4,
       maxLines: 1,
       group: data.autoSizeGroup,
+    );
+  }
+}
+
+class _DelayedAnimatedOpacity extends StatefulWidget {
+  final double opacity;
+  final Duration duration;
+  final Curve curve;
+  final Duration delay;
+  final Widget child;
+
+  const _DelayedAnimatedOpacity({
+    required this.opacity,
+    required this.duration,
+    required this.curve,
+    required this.delay,
+    required this.child,
+  });
+
+  @override
+  State<_DelayedAnimatedOpacity> createState() =>
+      _DelayedAnimatedOpacityState();
+}
+
+class _DelayedAnimatedOpacityState extends State<_DelayedAnimatedOpacity> {
+  late double _currentOpacity;
+  Timer? _delayTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentOpacity = widget.opacity;
+  }
+
+  @override
+  void didUpdateWidget(_DelayedAnimatedOpacity oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.opacity != widget.opacity) {
+      _delayTimer?.cancel();
+      if (widget.delay == Duration.zero) {
+        setState(() {
+          _currentOpacity = widget.opacity;
+        });
+      } else {
+        _delayTimer = Timer(widget.delay, () {
+          if (mounted) {
+            setState(() {
+              _currentOpacity = widget.opacity;
+            });
+          }
+        });
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _delayTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedOpacity(
+      opacity: _currentOpacity,
+      duration: widget.duration,
+      curve: widget.curve,
+      child: widget.child,
     );
   }
 }
