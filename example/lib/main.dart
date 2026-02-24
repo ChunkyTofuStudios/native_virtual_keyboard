@@ -88,14 +88,12 @@ class _MyAppState extends State<MyApp> {
       AnimationType.staggeredSequential => const KeyboardAnimationConfig(
           duration: Duration(milliseconds: 300),
           curve: Curves.easeInOut,
-          staggered: true,
           staggerDelay: Duration(milliseconds: 30),
           staggerPattern: StaggerPattern.sequential,
         ),
       AnimationType.staggeredDiagonal => const KeyboardAnimationConfig(
           duration: Duration(milliseconds: 300),
           curve: Curves.easeInOut,
-          staggered: true,
           staggerDelay: Duration(milliseconds: 80),
           staggerPattern: StaggerPattern.diagonal,
         ),

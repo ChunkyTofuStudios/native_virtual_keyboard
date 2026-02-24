@@ -22,22 +22,18 @@ class KeyboardAnimationConfig {
   /// Animation curve.
   final Curve curve;
 
-  /// If true, keys animate with a staggered delay based on their position.
-  /// If false, all keys animate simultaneously.
-  final bool staggered;
+  /// The stagger pattern to use. If null, stagger animation is disabled.
+  final StaggerPattern? staggerPattern;
 
-  /// Delay between each key's animation start when [staggered] is true.
+  /// Delay between each key's animation start.
+  /// Ignored if [staggerPattern] is null.
   final Duration staggerDelay;
-
-  /// The stagger pattern to use when [staggered] is true.
-  final StaggerPattern staggerPattern;
 
   const KeyboardAnimationConfig({
     this.duration = const Duration(milliseconds: 300),
     this.curve = Curves.easeInOut,
-    this.staggered = false,
+    this.staggerPattern,
     this.staggerDelay = const Duration(milliseconds: 50),
-    this.staggerPattern = StaggerPattern.sequential,
   });
 
   static const defaultConfig = KeyboardAnimationConfig();
@@ -49,16 +45,14 @@ class KeyboardAnimationConfig {
           runtimeType == other.runtimeType &&
           duration == other.duration &&
           curve == other.curve &&
-          staggered == other.staggered &&
-          staggerDelay == other.staggerDelay &&
-          staggerPattern == other.staggerPattern;
+          staggerPattern == other.staggerPattern &&
+          staggerDelay == other.staggerDelay;
 
   @override
   int get hashCode => Object.hash(
         duration,
         curve,
-        staggered,
-        staggerDelay,
         staggerPattern,
+        staggerDelay,
       );
 }
