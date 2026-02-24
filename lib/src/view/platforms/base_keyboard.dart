@@ -153,8 +153,7 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
                             size: key.special
                                 ? dimensions.keyDimensions.specialSize
                                 : dimensions.keyDimensions.size,
-                            borderRadius:
-                                dimensions.keyDimensions.borderRadius,
+                            borderRadius: dimensions.keyDimensions.borderRadius,
                             elevation: dimensions.keyDimensions.elevation,
                             overlaySize: dimensions.keyDimensions.overlaySize,
                             padding: EdgeInsets.symmetric(
@@ -173,7 +172,8 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
                                 enabledKeys != null &&
                                 !enabledKeys.contains(key),
                             animationConfig: animConfig,
-                            animationDelay: _keyToAnimationDelay[key] ?? Duration.zero,
+                            animationDelay:
+                                _keyToAnimationDelay[key] ?? Duration.zero,
                           ),
                         ),
                       ),
@@ -522,4 +522,3 @@ class _KeyButton extends StatelessWidget {
     );
   }
 }
-

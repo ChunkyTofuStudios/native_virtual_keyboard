@@ -82,21 +82,21 @@ class _MyAppState extends State<MyApp> {
     return switch (_animationType) {
       AnimationType.none => null,
       AnimationType.simultaneous => const KeyboardAnimationConfig(
-          duration: Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-        ),
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      ),
       AnimationType.staggeredSequential => const KeyboardAnimationConfig(
-          duration: Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-          staggerDelay: Duration(milliseconds: 30),
-          staggerPattern: StaggerPattern.sequential,
-        ),
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        staggerDelay: Duration(milliseconds: 30),
+        staggerPattern: StaggerPattern.sequential,
+      ),
       AnimationType.staggeredDiagonal => const KeyboardAnimationConfig(
-          duration: Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-          staggerDelay: Duration(milliseconds: 80),
-          staggerPattern: StaggerPattern.diagonal,
-        ),
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        staggerDelay: Duration(milliseconds: 80),
+        staggerPattern: StaggerPattern.diagonal,
+      ),
     };
   }
 

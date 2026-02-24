@@ -49,10 +49,6 @@ class KeyboardAnimationConfig {
           staggerDelay == other.staggerDelay;
 
   @override
-  int get hashCode => Object.hash(
-        duration,
-        curve,
-        staggerPattern,
-        staggerDelay,
-      );
+  int get hashCode =>
+      Object.hash(duration, curve, staggerPattern, staggerDelay);
 }
