@@ -67,7 +67,8 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
   void _populateAnimationDelays() {
     _keyToAnimationDelay.clear();
     final config = widget.animationConfig;
-    if (config == null || config.staggerPattern == null) {
+    final staggerPattern = config?.staggerPattern;
+    if (config == null || staggerPattern == null) {
       return;
     }
 
@@ -76,7 +77,7 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
     for (var r = 0; r < layout.length; r++) {
       for (var c = 0; c < layout[r].length; c++) {
         final key = layout[r][c];
-        final staggerIndex = switch (config.staggerPattern!) {
+        final staggerIndex = switch (staggerPattern) {
           StaggerPattern.sequential => flatIndex,
           StaggerPattern.diagonal => r + c,
         };
@@ -305,7 +306,7 @@ class _KeyState extends State<_Key> {
         ? widget.data
         : widget.data.withDisabled(_effectiveDisabled);
 
-    // CR-9: Block taps immediately when the real state is disabled,
+    // Block taps immediately when the real state is disabled,
     // even if the stagger delay hasn't elapsed yet.
     final blockTaps = widget.data.isDisabled && !_effectiveDisabled;
 
@@ -337,8 +338,6 @@ class _KeyState extends State<_Key> {
     final config = widget.data.animationConfig;
     if (config == null) return child;
 
-    // Opacity is computed from _effectiveDisabled (the single source of truth)
-    // so it stays in sync with the interactive state.
     final disabledOpacity =
         widget.data.theme.keyTheme.disabledBackgroundColor != null ? 1.0 : 0.4;
     final targetOpacity = _effectiveDisabled ? disabledOpacity : 1.0;
