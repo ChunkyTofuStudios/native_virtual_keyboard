@@ -65,15 +65,22 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
   }
 
   void _populateAnimationDelays() {
-    _keyToAnimationDelay.clear();
     final config = widget.animationConfig;
     final staggerPattern = config?.staggerPattern;
     if (config == null || staggerPattern == null) {
+      if (mounted) {
+        setState(() {
+          _keyToAnimationDelay.clear();
+        });
+      } else {
+        _keyToAnimationDelay.clear();
+      }
       return;
     }
 
     final layout = widget.controller.layout.layout;
     var flatIndex = 0;
+    final Map<VirtualKeyboardKey, Duration> newDelays = {};
     for (var r = 0; r < layout.length; r++) {
       for (var c = 0; c < layout[r].length; c++) {
         final key = layout[r][c];
@@ -81,9 +88,21 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
           StaggerPattern.sequential => flatIndex,
           StaggerPattern.diagonal => r + c,
         };
-        _keyToAnimationDelay[key] = config.staggerDelay * staggerIndex;
+        newDelays[key] = config.staggerDelay * staggerIndex;
         flatIndex++;
       }
+    }
+
+    if (mounted) {
+      setState(() {
+        _keyToAnimationDelay
+          ..clear()
+          ..addAll(newDelays);
+      });
+    } else {
+      _keyToAnimationDelay
+        ..clear()
+        ..addAll(newDelays);
     }
   }
 
@@ -281,7 +300,9 @@ class _KeyState extends State<_Key> {
       final delay = widget.data.animationDelay;
 
       if (delay == Duration.zero) {
-        _effectiveDisabled = widget.data.isDisabled;
+        setState(() {
+          _effectiveDisabled = widget.data.isDisabled;
+        });
       } else {
         _staggerDelayTimer = Timer(delay, () {
           if (mounted) {

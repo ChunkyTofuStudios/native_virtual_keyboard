@@ -1,3 +1,4 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
 /// Pattern used for staggered key animations.
@@ -15,7 +16,7 @@ enum StaggerPattern {
 /// When provided to [VirtualKeyboard], keys will animate their opacity
 /// when transitioning between enabled and disabled states.
 @immutable
-class KeyboardAnimationConfig {
+class KeyboardAnimationConfig extends Equatable {
   /// Duration of the fade animation.
   final Duration duration;
 
@@ -39,16 +40,5 @@ class KeyboardAnimationConfig {
   static const defaultConfig = KeyboardAnimationConfig();
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is KeyboardAnimationConfig &&
-          runtimeType == other.runtimeType &&
-          duration == other.duration &&
-          curve == other.curve &&
-          staggerPattern == other.staggerPattern &&
-          staggerDelay == other.staggerDelay;
-
-  @override
-  int get hashCode =>
-      Object.hash(duration, curve, staggerPattern, staggerDelay);
+  List<Object?> get props => [duration, curve, staggerPattern, staggerDelay];
 }
