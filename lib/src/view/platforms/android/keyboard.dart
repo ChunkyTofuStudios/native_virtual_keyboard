@@ -13,6 +13,7 @@ final class AndroidKeyboard extends BaseKeyboard {
     super.showEnter,
     super.showBackspace,
     super.specialKeyWidthMultiplier,
+    super.animationConfig,
   });
 
   static const lightTheme = KeyboardTheme(

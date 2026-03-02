@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:native_virtual_keyboard/src/model/virtual_keyboard_key.dart';
 import 'package:native_virtual_keyboard/src/view/inner_shadow_painter.dart';
+import 'package:native_virtual_keyboard/src/view/keyboard_animation.dart';
 import 'package:native_virtual_keyboard/src/view/keyboard_dimensions.dart';
 import 'package:native_virtual_keyboard/src/view/keyboard_theme.dart';
 import 'package:native_virtual_keyboard/src/view/virtual_keyboard_controller.dart';
@@ -21,6 +23,7 @@ abstract class BaseKeyboard extends StatefulWidget {
   final bool showEnter;
   final bool showBackspace;
   final double? specialKeyWidthMultiplier;
+  final KeyboardAnimationConfig? animationConfig;
 
   const BaseKeyboard({
     super.key,
@@ -29,6 +32,7 @@ abstract class BaseKeyboard extends StatefulWidget {
     this.showEnter = true,
     this.showBackspace = true,
     this.specialKeyWidthMultiplier,
+    this.animationConfig,
   });
 
   KeyboardTheme getTheme(Brightness brightness);
@@ -43,6 +47,64 @@ abstract class BaseKeyboard extends StatefulWidget {
 
 class _BaseKeyboardState extends State<BaseKeyboard> {
   final AutoSizeGroup _autoSizeGroup = AutoSizeGroup();
+  final Map<VirtualKeyboardKey, Duration> _keyToAnimationDelay = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _populateAnimationDelays();
+  }
+
+  @override
+  void didUpdateWidget(BaseKeyboard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.controller.layout != widget.controller.layout ||
+        oldWidget.animationConfig != widget.animationConfig) {
+      _populateAnimationDelays();
+    }
+  }
+
+  void _populateAnimationDelays() {
+    final config = widget.animationConfig;
+    final staggerPattern = config?.staggerPattern;
+    if (config == null || staggerPattern == null) {
+      if (mounted) {
+        setState(() {
+          _keyToAnimationDelay.clear();
+        });
+      } else {
+        _keyToAnimationDelay.clear();
+      }
+      return;
+    }
+
+    final layout = widget.controller.layout.layout;
+    var flatIndex = 0;
+    final Map<VirtualKeyboardKey, Duration> newDelays = {};
+    for (var r = 0; r < layout.length; r++) {
+      for (var c = 0; c < layout[r].length; c++) {
+        final key = layout[r][c];
+        final staggerIndex = switch (staggerPattern) {
+          StaggerPattern.sequential => flatIndex,
+          StaggerPattern.diagonal => r + c,
+        };
+        newDelays[key] = config.staggerDelay * staggerIndex;
+        flatIndex++;
+      }
+    }
+
+    if (mounted) {
+      setState(() {
+        _keyToAnimationDelay
+          ..clear()
+          ..addAll(newDelays);
+      });
+    } else {
+      _keyToAnimationDelay
+        ..clear()
+        ..addAll(newDelays);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +118,9 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
       widget.controller.layout,
       specialKeyWidthMultiplier: widget.specialKeyWidthMultiplier,
     );
+
+    final animConfig = widget.animationConfig;
+    final layout = widget.controller.layout.layout;
 
     return Container(
       decoration: BoxDecoration(
@@ -84,12 +149,12 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
                     dimensions.keyDimensions.verticalSpacing / 2,
               ),
             ),
-            for (final row in widget.controller.layout.layout)
+            for (final row in layout)
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  for (final (index, key) in row.indexed) ...[
-                    if (key.special && index > 0) const Spacer(),
+                  for (final (colIndex, key) in row.indexed) ...[
+                    if (key.special && colIndex > 0) const Spacer(),
                     Visibility(
                       visible:
                           !((key == VirtualKeyboardKey.enter &&
@@ -102,6 +167,7 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
                       child: ValueListenableBuilder(
                         valueListenable: widget.controller.enabledKeys,
                         builder: (context, enabledKeys, child) => _Key(
+                          key: ValueKey(key),
                           data: KeyParams(
                             key: key,
                             size: key.special
@@ -125,11 +191,15 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
                             isDisabled:
                                 enabledKeys != null &&
                                 !enabledKeys.contains(key),
+                            animationConfig: animConfig,
+                            animationDelay:
+                                _keyToAnimationDelay[key] ?? Duration.zero,
                           ),
                         ),
                       ),
                     ),
-                    if (key.special && index < row.length - 1) const Spacer(),
+                    if (key.special && colIndex < row.length - 1)
+                      const Spacer(),
                   ],
                 ],
               ),
@@ -153,6 +223,8 @@ final class KeyParams {
   final OverlayFollowerBuilder overlayFollowerBuilder;
   final VirtualKeyboardController controller;
   final bool isDisabled;
+  final KeyboardAnimationConfig? animationConfig;
+  final Duration animationDelay;
 
   const KeyParams({
     required this.key,
@@ -166,13 +238,37 @@ final class KeyParams {
     required this.overlayFollowerBuilder,
     required this.controller,
     this.isDisabled = false,
+    this.animationConfig,
+    this.animationDelay = Duration.zero,
   });
+
+  /// Creates a copy with a different [isDisabled] value.
+  ///
+  /// Only this field is supported because [KeyParams] is internal
+  /// and only the disabled state changes at runtime.
+  KeyParams withDisabled(bool isDisabled) {
+    return KeyParams(
+      key: key,
+      size: size,
+      borderRadius: borderRadius,
+      elevation: elevation,
+      overlaySize: overlaySize,
+      padding: padding,
+      theme: theme,
+      autoSizeGroup: autoSizeGroup,
+      overlayFollowerBuilder: overlayFollowerBuilder,
+      controller: controller,
+      isDisabled: isDisabled,
+      animationConfig: animationConfig,
+      animationDelay: animationDelay,
+    );
+  }
 }
 
 class _Key extends StatefulWidget {
   final KeyParams data;
 
-  const _Key({required this.data});
+  const _Key({super.key, required this.data});
 
   @override
   State<_Key> createState() => _KeyState();
@@ -182,9 +278,60 @@ class _KeyState extends State<_Key> {
   final OverlayPortalController _overlayController = OverlayPortalController();
   final LayerLink _overlayLayerLink = LayerLink();
 
+  /// The effective disabled state, which may be delayed for staggered animations
+  /// so that the key retains its normal appearance until its turn arrives.
+  ///
+  /// Both the visual appearance (opacity) and the interactive state are derived
+  /// from this single source of truth, ensuring they stay in sync.
+  late bool _effectiveDisabled;
+  Timer? _staggerDelayTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _effectiveDisabled = widget.data.isDisabled;
+  }
+
+  @override
+  void didUpdateWidget(_Key oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.data.isDisabled != widget.data.isDisabled) {
+      _staggerDelayTimer?.cancel();
+      final delay = widget.data.animationDelay;
+
+      if (delay == Duration.zero) {
+        setState(() {
+          _effectiveDisabled = widget.data.isDisabled;
+        });
+      } else {
+        _staggerDelayTimer = Timer(delay, () {
+          if (mounted) {
+            setState(() {
+              _effectiveDisabled = widget.data.isDisabled;
+            });
+          }
+        });
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _staggerDelayTimer?.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return CompositedTransformTarget(
+    final effectiveData = _effectiveDisabled == widget.data.isDisabled
+        ? widget.data
+        : widget.data.withDisabled(_effectiveDisabled);
+
+    // Block taps immediately when the real state is disabled,
+    // even if the stagger delay hasn't elapsed yet.
+    final blockTaps = widget.data.isDisabled && !_effectiveDisabled;
+
+    Widget child = CompositedTransformTarget(
       link: _overlayLayerLink,
       child: OverlayPortal(
         controller: _overlayController,
@@ -199,10 +346,28 @@ class _KeyState extends State<_Key> {
           ),
         ),
         child: _ActiveKey(
-          data: widget.data,
+          data: effectiveData,
           overlayController: _overlayController,
         ),
       ),
+    );
+
+    if (blockTaps) {
+      child = IgnorePointer(child: child);
+    }
+
+    final config = widget.data.animationConfig;
+    if (config == null) return child;
+
+    final disabledOpacity =
+        widget.data.theme.keyTheme.disabledBackgroundColor != null ? 1.0 : 0.4;
+    final targetOpacity = _effectiveDisabled ? disabledOpacity : 1.0;
+
+    return AnimatedOpacity(
+      opacity: targetOpacity,
+      duration: config.duration,
+      curve: config.curve,
+      child: child,
     );
   }
 }

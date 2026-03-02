@@ -5,6 +5,16 @@ void main() {
   runApp(const MyApp());
 }
 
+enum AnimationType {
+  none('No Animation'),
+  simultaneous('Simultaneous'),
+  staggeredSequential('Staggered (Sequential)'),
+  staggeredDiagonal('Staggered (Diagonal)');
+
+  final String label;
+  const AnimationType(this.label);
+}
+
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
@@ -13,23 +23,54 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  // Config state
   KeyboardPlatform? _selectedPlatform;
   bool _useCustomTheme = false;
   bool _showEnter = true;
   bool _showBackspace = true;
-  Set<VirtualKeyboardKey> _enabledKeys = {
+  AnimationType _animationType = AnimationType.simultaneous;
+
+  final _textController = TextEditingController();
+  late final VirtualKeyboardController _keyboardController;
+
+  static const _demoEnabledKeys = {
     VirtualKeyboardKey.q,
     VirtualKeyboardKey.w,
     VirtualKeyboardKey.e,
     VirtualKeyboardKey.r,
     VirtualKeyboardKey.t,
     VirtualKeyboardKey.y,
-  }; // Demo: only enable these keys
-  bool _restrictKeys = false;
+  };
 
-  // Text controller
-  final _textController = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+    _keyboardController = VirtualKeyboardController(
+      layout: EnglishQwertyKeyboardLayout(),
+      onKeyPress: _onKeyPress,
+    );
+  }
+
+  void _onKeyPress(VirtualKeyboardKey key) {
+    final text = _textController.text;
+    if (key == VirtualKeyboardKey.backspace) {
+      if (text.isNotEmpty) {
+        _textController.text = text.substring(0, text.length - 1);
+      }
+      return;
+    }
+    if (key == VirtualKeyboardKey.enter) {
+      _textController.text = '$text\n';
+      return;
+    }
+    _textController.text = text + key.text;
+  }
+
+  void _toggleKeys() {
+    final currentlyRestricted = _keyboardController.enabledKeys.value != null;
+    _keyboardController.setEnabledKeys(
+      currentlyRestricted ? null : _demoEnabledKeys,
+    );
+  }
 
   @override
   void dispose() {
@@ -37,25 +78,44 @@ class _MyAppState extends State<MyApp> {
     super.dispose();
   }
 
-  // Example of a completely custom theme (e.g. "Midnight Blue")
+  KeyboardAnimationConfig? get _animationConfig {
+    return switch (_animationType) {
+      AnimationType.none => null,
+      AnimationType.simultaneous => const KeyboardAnimationConfig(
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      ),
+      AnimationType.staggeredSequential => const KeyboardAnimationConfig(
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        staggerDelay: Duration(milliseconds: 30),
+        staggerPattern: StaggerPattern.sequential,
+      ),
+      AnimationType.staggeredDiagonal => const KeyboardAnimationConfig(
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        staggerDelay: Duration(milliseconds: 80),
+        staggerPattern: StaggerPattern.diagonal,
+      ),
+    };
+  }
+
   KeyboardTheme get _customTheme {
-    // Start with a base, or build from scratch
     return KeyboardTheme(
-      backgroundColor: const Color(0xFF0F172A), // Dark slate
+      backgroundColor: const Color(0xFF0F172A),
       keyTheme: const KeyboardKeyTheme(
-        backgroundColor: Color(0xFF1E293B), // Slate 800
-        pressedBackgroundColor: Color(0xFF334155), // Slate 700
+        backgroundColor: Color(0xFF1E293B),
+        pressedBackgroundColor: Color(0xFF334155),
         foregroundColor: Colors.white,
         shadows: [
           BoxShadow(color: Colors.black45, offset: Offset(0, 2), blurRadius: 2),
         ],
-        // innerShadows: ... optional
         overlayBackgroundColor: Color(0xFF1E293B),
         overlayTextColor: Colors.white,
         keyTextStyle: TextStyle(
           fontSize: 22,
           fontWeight: FontWeight.w500,
-          fontFamily: 'Roboto', // Or any custom font
+          fontFamily: 'Roboto',
         ),
       ),
       specialKeyTheme: const KeyboardSpecialKeyTheme(
@@ -126,6 +186,61 @@ class _MyAppState extends State<MyApp> {
                   ),
                   const SizedBox(height: 16),
 
+                  // Animation Type Selector
+                  InputDecorator(
+                    decoration: const InputDecoration(
+                      labelText: 'Animation Type',
+                      border: OutlineInputBorder(),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 4,
+                      ),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<AnimationType>(
+                        value: _animationType,
+                        isExpanded: true,
+                        items: AnimationType.values
+                            .map(
+                              (e) => DropdownMenuItem(
+                                value: e,
+                                child: Text(e.label),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (value) =>
+                            setState(() => _animationType = value!),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Toggle Keys Button — uses ValueListenableBuilder to avoid
+                  // rebuilding the keyboard widget tree on toggle.
+                  ValueListenableBuilder<Set<VirtualKeyboardKey>?>(
+                    valueListenable: _keyboardController.enabledKeys,
+                    builder: (context, enabledKeys, child) {
+                      final isRestricted = enabledKeys != null;
+                      return SizedBox(
+                        height: 48,
+                        child: FilledButton.icon(
+                          onPressed: _toggleKeys,
+                          icon: Icon(
+                            isRestricted
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                          ),
+                          label: Text(
+                            isRestricted
+                                ? 'Enable All Keys'
+                                : 'Disable Some Keys (keep Q W E R T Y)',
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 16),
+
                   // Theme Toggle
                   SwitchListTile(
                     title: const Text('Use Custom Theme'),
@@ -133,8 +248,6 @@ class _MyAppState extends State<MyApp> {
                     value: _useCustomTheme,
                     onChanged: (v) => setState(() => _useCustomTheme = v),
                   ),
-
-                  // Key Toggles
                   SwitchListTile(
                     title: const Text('Show Enter Key'),
                     value: _showEnter,
@@ -145,45 +258,13 @@ class _MyAppState extends State<MyApp> {
                     value: _showBackspace,
                     onChanged: (v) => setState(() => _showBackspace = v),
                   ),
-                  SwitchListTile(
-                    title: const Text('Restrict Enabled Keys'),
-                    subtitle: Text(
-                      _restrictKeys
-                          ? 'Only these keys enabled: ${_enabledKeys.map((e) => e.text).join(", ")}'
-                          : 'All keys enabled',
-                    ),
-                    value: _restrictKeys,
-                    onChanged: (v) => setState(() => _restrictKeys = v),
-                  ),
-                  if (_restrictKeys)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: TextField(
-                        decoration: const InputDecoration(
-                          labelText: 'Enabled Keys (Whitelist)',
-                          hintText: 'Enter letters to enable (e.g. QWERTY)',
-                          border: OutlineInputBorder(),
-                        ),
-                        onChanged: (value) {
-                          setState(() {
-                            _enabledKeys = value
-                                .split('')
-                                .map(
-                                  (char) => VirtualKeyboardKey.fromChar(char),
-                                )
-                                .whereType<VirtualKeyboardKey>()
-                                .toSet();
-                          });
-                        },
-                      ),
-                    ),
 
                   const Divider(height: 32),
 
                   // Text Input visualization
                   TextField(
                     controller: _textController,
-                    readOnly: true, // Prevent system keyboard
+                    readOnly: true,
                     autofocus: true,
                     showCursor: true,
                     decoration: const InputDecoration(
@@ -213,36 +294,11 @@ class _MyAppState extends State<MyApp> {
               ),
               child: VirtualKeyboard(
                 platform: _selectedPlatform,
-                // If _useCustomTheme is true, apply our custom "Midnight Blue" theme.
-                // Otherwise, pass null to let the widget use the native platform default.
                 theme: _useCustomTheme ? _customTheme : null,
-
                 showEnter: _showEnter,
                 showBackspace: _showBackspace,
-                controller: VirtualKeyboardController(
-                  enabledKeys: _restrictKeys ? _enabledKeys : null,
-                  layout: EnglishQwertyKeyboardLayout(),
-                  onKeyPress: (key) {
-                    final text = _textController.text;
-
-                    if (key == VirtualKeyboardKey.backspace) {
-                      if (text.isNotEmpty) {
-                        _textController.text = text.substring(
-                          0,
-                          text.length - 1,
-                        );
-                      }
-                      return;
-                    }
-
-                    if (key == VirtualKeyboardKey.enter) {
-                      _textController.text = '$text\n';
-                      return;
-                    }
-
-                    _textController.text = text + key.text;
-                  },
-                ),
+                animationConfig: _animationConfig,
+                controller: _keyboardController,
               ),
             ),
           ],

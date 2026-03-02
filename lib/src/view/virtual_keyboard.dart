@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:native_virtual_keyboard/src/extensions/ios_version_infos.dart';
+import 'package:native_virtual_keyboard/src/view/keyboard_animation.dart';
 import 'package:native_virtual_keyboard/src/view/keyboard_platform.dart';
 import 'package:native_virtual_keyboard/src/view/keyboard_theme.dart';
 import 'package:native_virtual_keyboard/src/view/platforms/android/keyboard.dart';
@@ -46,6 +47,12 @@ final class VirtualKeyboard extends StatelessWidget {
   /// Whether to show the backspace key.
   final bool showBackspace;
 
+  /// Animation configuration for key disable/enable transitions.
+  ///
+  /// When provided, keys will fade in/out when their enabled state changes.
+  /// If null (default), transitions are instant (existing behavior).
+  final KeyboardAnimationConfig? animationConfig;
+
   const VirtualKeyboard({
     super.key,
     required this.controller,
@@ -54,6 +61,7 @@ final class VirtualKeyboard extends StatelessWidget {
     this.specialKeyWidthMultiplier,
     this.showEnter = true,
     this.showBackspace = true,
+    this.animationConfig,
   });
 
   @override
@@ -75,6 +83,7 @@ final class VirtualKeyboard extends StatelessWidget {
             showEnter: showEnter,
             showBackspace: showBackspace,
             specialKeyWidthMultiplier: specialKeyWidthMultiplier,
+            animationConfig: animationConfig,
           ),
           KeyboardPlatform.ios18 => Ios18Keyboard(
             controller: controller,
@@ -82,6 +91,7 @@ final class VirtualKeyboard extends StatelessWidget {
             showEnter: showEnter,
             showBackspace: showBackspace,
             specialKeyWidthMultiplier: specialKeyWidthMultiplier,
+            animationConfig: animationConfig,
           ),
           KeyboardPlatform.ios26 => Ios26Keyboard(
             controller: controller,
@@ -89,6 +99,7 @@ final class VirtualKeyboard extends StatelessWidget {
             showEnter: showEnter,
             showBackspace: showBackspace,
             specialKeyWidthMultiplier: specialKeyWidthMultiplier,
+            animationConfig: animationConfig,
           ),
         };
       },

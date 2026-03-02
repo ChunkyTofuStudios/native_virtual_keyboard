@@ -14,6 +14,7 @@ final class Ios26Keyboard extends BaseKeyboard {
     super.showEnter,
     super.showBackspace,
     super.specialKeyWidthMultiplier,
+    super.animationConfig,
   });
 
   static const lightTheme = KeyboardTheme(
