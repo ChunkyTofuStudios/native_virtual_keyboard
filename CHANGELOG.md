@@ -1,3 +1,7 @@
+## 0.2.6
+
+* Add animation for key enabled/disabled
+
 ## 0.2.5
 
 * setEnabledKeys accepts null argument
