@@ -23,6 +23,13 @@ import 'package:native_virtual_keyboard/src/view/virtual_keyboard_controller.dar
 /// For custom themes, create a new [KeyboardTheme] instance.
 final class VirtualKeyboard extends StatelessWidget {
   static final _log = Logger('VirtualKeyboard');
+  static final bool _isIOS = !kIsWeb && Platform.isIOS;
+
+  /// Cached iOS device info future — platform never changes at runtime,
+  /// so a single static fetch is sufficient for the process lifetime.
+  static final Future<IosDeviceInfo>? _iosInfoFuture = _isIOS
+      ? DeviceInfoPlugin().iosInfo
+      : null;
 
   /// Force a specific platform. If not provided, the platform will be detected automatically.
   final KeyboardPlatform? platform;
@@ -66,58 +73,58 @@ final class VirtualKeyboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final override = platform;
+    if (override != null) {
+      return _buildKeyboard(override);
+    }
+
+    final future = _iosInfoFuture;
+    if (future == null) {
+      return _buildKeyboard(KeyboardPlatform.android);
+    }
+
     return FutureBuilder(
-      future: _isIOS && platform == null
-          ? DeviceInfoPlugin().iosInfo
-          : Future.value(null),
+      future: future,
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
           return const SizedBox.shrink();
         }
-        final effectivePlatform = _getPlatform(snapshot.data);
-        _log.fine('Platform identified as: ${effectivePlatform.name}');
-        return switch (effectivePlatform) {
-          KeyboardPlatform.android => AndroidKeyboard(
-            controller: controller,
-            theme: theme,
-            showEnter: showEnter,
-            showBackspace: showBackspace,
-            specialKeyWidthMultiplier: specialKeyWidthMultiplier,
-            animationConfig: animationConfig,
-          ),
-          KeyboardPlatform.ios18 => Ios18Keyboard(
-            controller: controller,
-            theme: theme,
-            showEnter: showEnter,
-            showBackspace: showBackspace,
-            specialKeyWidthMultiplier: specialKeyWidthMultiplier,
-            animationConfig: animationConfig,
-          ),
-          KeyboardPlatform.ios26 => Ios26Keyboard(
-            controller: controller,
-            theme: theme,
-            showEnter: showEnter,
-            showBackspace: showBackspace,
-            specialKeyWidthMultiplier: specialKeyWidthMultiplier,
-            animationConfig: animationConfig,
-          ),
-        };
+        final iosInfo = snapshot.data;
+        final effectivePlatform = iosInfo != null && iosInfo.isIos26
+            ? KeyboardPlatform.ios26
+            : KeyboardPlatform.ios18;
+        return _buildKeyboard(effectivePlatform);
       },
     );
   }
 
-  bool get _isIOS => !kIsWeb && Platform.isIOS;
-
-  KeyboardPlatform _getPlatform(IosDeviceInfo? iosDeviceInfo) {
-    final override = platform;
-    if (override != null) {
-      return override;
-    }
-    if (iosDeviceInfo != null) {
-      return iosDeviceInfo.isIos26
-          ? KeyboardPlatform.ios26
-          : KeyboardPlatform.ios18;
-    }
-    return KeyboardPlatform.android;
+  Widget _buildKeyboard(KeyboardPlatform effectivePlatform) {
+    _log.fine('Platform identified as: ${effectivePlatform.name}');
+    return switch (effectivePlatform) {
+      KeyboardPlatform.android => AndroidKeyboard(
+        controller: controller,
+        theme: theme,
+        showEnter: showEnter,
+        showBackspace: showBackspace,
+        specialKeyWidthMultiplier: specialKeyWidthMultiplier,
+        animationConfig: animationConfig,
+      ),
+      KeyboardPlatform.ios18 => Ios18Keyboard(
+        controller: controller,
+        theme: theme,
+        showEnter: showEnter,
+        showBackspace: showBackspace,
+        specialKeyWidthMultiplier: specialKeyWidthMultiplier,
+        animationConfig: animationConfig,
+      ),
+      KeyboardPlatform.ios26 => Ios26Keyboard(
+        controller: controller,
+        theme: theme,
+        showEnter: showEnter,
+        showBackspace: showBackspace,
+        specialKeyWidthMultiplier: specialKeyWidthMultiplier,
+        animationConfig: animationConfig,
+      ),
+    };
   }
 }
