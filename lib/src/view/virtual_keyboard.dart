@@ -73,58 +73,57 @@ final class VirtualKeyboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final override = platform;
-    if (override != null) {
-      return _buildKeyboard(override);
-    }
-
-    final future = _iosInfoFuture;
-    if (future == null) {
-      return _buildKeyboard(KeyboardPlatform.android);
-    }
-
     return FutureBuilder(
-      future: future,
+      future: _isIOS && platform == null
+          ? (_iosInfoFuture ?? Future.value(null))
+          : Future.value(null),
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
           return const SizedBox.shrink();
         }
-        final iosInfo = snapshot.data;
-        final effectivePlatform = iosInfo != null && iosInfo.isIos26
-            ? KeyboardPlatform.ios26
-            : KeyboardPlatform.ios18;
-        return _buildKeyboard(effectivePlatform);
+        final effectivePlatform = _getPlatform(snapshot.data);
+        _log.fine('Platform identified as: ${effectivePlatform.name}');
+
+        return switch (effectivePlatform) {
+          KeyboardPlatform.android => AndroidKeyboard(
+            controller: controller,
+            theme: theme,
+            showEnter: showEnter,
+            showBackspace: showBackspace,
+            specialKeyWidthMultiplier: specialKeyWidthMultiplier,
+            animationConfig: animationConfig,
+          ),
+          KeyboardPlatform.ios18 => Ios18Keyboard(
+            controller: controller,
+            theme: theme,
+            showEnter: showEnter,
+            showBackspace: showBackspace,
+            specialKeyWidthMultiplier: specialKeyWidthMultiplier,
+            animationConfig: animationConfig,
+          ),
+          KeyboardPlatform.ios26 => Ios26Keyboard(
+            controller: controller,
+            theme: theme,
+            showEnter: showEnter,
+            showBackspace: showBackspace,
+            specialKeyWidthMultiplier: specialKeyWidthMultiplier,
+            animationConfig: animationConfig,
+          ),
+        };
       },
     );
   }
 
-  Widget _buildKeyboard(KeyboardPlatform effectivePlatform) {
-    _log.fine('Platform identified as: ${effectivePlatform.name}');
-    return switch (effectivePlatform) {
-      KeyboardPlatform.android => AndroidKeyboard(
-        controller: controller,
-        theme: theme,
-        showEnter: showEnter,
-        showBackspace: showBackspace,
-        specialKeyWidthMultiplier: specialKeyWidthMultiplier,
-        animationConfig: animationConfig,
-      ),
-      KeyboardPlatform.ios18 => Ios18Keyboard(
-        controller: controller,
-        theme: theme,
-        showEnter: showEnter,
-        showBackspace: showBackspace,
-        specialKeyWidthMultiplier: specialKeyWidthMultiplier,
-        animationConfig: animationConfig,
-      ),
-      KeyboardPlatform.ios26 => Ios26Keyboard(
-        controller: controller,
-        theme: theme,
-        showEnter: showEnter,
-        showBackspace: showBackspace,
-        specialKeyWidthMultiplier: specialKeyWidthMultiplier,
-        animationConfig: animationConfig,
-      ),
-    };
+  KeyboardPlatform _getPlatform(IosDeviceInfo? iosDeviceInfo) {
+    final override = platform;
+    if (override != null) {
+      return override;
+    }
+    if (iosDeviceInfo != null) {
+      return iosDeviceInfo.isIos26
+          ? KeyboardPlatform.ios26
+          : KeyboardPlatform.ios18;
+    }
+    return KeyboardPlatform.android;
   }
 }

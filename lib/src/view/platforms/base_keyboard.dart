@@ -426,8 +426,7 @@ class _ActiveKeyState extends State<_ActiveKey> {
       );
     }
 
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
+    return InkWell(
       onTap: () => widget.data.controller.onKeyPress?.call(widget.data.key),
       onTapDown: (_) {
         if (!mounted) return;
