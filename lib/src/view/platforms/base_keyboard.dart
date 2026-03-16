@@ -420,6 +420,12 @@ class _ActiveKeyState extends State<_ActiveKey> {
   Widget build(BuildContext context) {
     // Disabled keys are not interactive
     if (widget.data.isDisabled) {
+      // Safety net: if the overlay is still showing when the key becomes
+      // disabled (e.g. due to stagger timing or rapid state changes),
+      // hide it to prevent a stuck overlay controller.
+      if (widget.overlayController.isShowing) {
+        widget.overlayController.hide();
+      }
       return Padding(
         padding: widget.data.padding,
         child: _KeyButton(data: widget.data, isPressed: false),
@@ -432,6 +438,12 @@ class _ActiveKeyState extends State<_ActiveKey> {
         if (!mounted) return;
         widget.data.controller.onKeyDown?.call(widget.data.key);
         if (!widget.data.key.special) {
+          // Defensive reset: if the controller thinks it's still showing
+          // (e.g. after a mass rebuild triggered by enabledKeys change),
+          // force-hide first so the subsequent show() is not a no-op.
+          if (widget.overlayController.isShowing) {
+            widget.overlayController.hide();
+          }
           widget.overlayController.show();
         }
         setState(() {
