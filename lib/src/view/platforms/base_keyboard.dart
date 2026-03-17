@@ -410,7 +410,7 @@ class _ActiveKeyState extends State<_ActiveKey> {
   /// pointer-down and pointer-up can arrive within the same vsync window.
   /// Without this deferral, [show] and [hide] execute in the same build
   /// pass and the overlay is never actually rendered.
-  void _deferHideOverlay() {
+  void _hideOverlayDeferred() {
     if (_hidePending) return;
     _hidePending = true;
     WidgetsBinding.instance.addPostFrameCallback((_) => _hideOverlayNow());
@@ -423,9 +423,7 @@ class _ActiveKeyState extends State<_ActiveKey> {
       // Safety net: if the overlay is still showing when the key becomes
       // disabled (e.g. due to stagger timing or rapid state changes),
       // hide it to prevent a stuck overlay controller.
-      if (widget.overlayController.isShowing) {
-        widget.overlayController.hide();
-      }
+      _hideOverlayNow();
       return Padding(
         padding: widget.data.padding,
         child: _KeyButton(data: widget.data, isPressed: false),
@@ -441,9 +439,7 @@ class _ActiveKeyState extends State<_ActiveKey> {
           // Defensive reset: if the controller thinks it's still showing
           // (e.g. after a mass rebuild triggered by enabledKeys change),
           // force-hide first so the subsequent show() is not a no-op.
-          if (widget.overlayController.isShowing) {
-            widget.overlayController.hide();
-          }
+          _hideOverlayNow();
           widget.overlayController.show();
         }
         setState(() {
@@ -453,7 +449,7 @@ class _ActiveKeyState extends State<_ActiveKey> {
       onTapUp: (_) {
         if (!mounted) return;
         widget.data.controller.onKeyUp?.call(widget.data.key);
-        _deferHideOverlay();
+        _hideOverlayDeferred();
         setState(() {
           _isPressed = false;
         });
@@ -461,7 +457,7 @@ class _ActiveKeyState extends State<_ActiveKey> {
       onTapCancel: () {
         if (!mounted) return;
         widget.data.controller.onKeyUp?.call(widget.data.key);
-        _deferHideOverlay();
+        _hideOverlayDeferred();
         setState(() {
           _isPressed = false;
         });
