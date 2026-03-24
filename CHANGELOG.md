@@ -1,3 +1,7 @@
+## 0.2.7
+
+* Fix key press animation
+
 ## 0.2.6
 
 * Add animation for key enabled/disabled
