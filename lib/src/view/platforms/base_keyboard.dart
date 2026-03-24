@@ -339,10 +339,12 @@ class _KeyState extends State<_Key> {
           width: widget.data.overlaySize.width,
           height: widget.data.overlaySize.height,
           bottom: 0,
-          child: widget.data.overlayFollowerBuilder(
-            context,
-            _overlayLayerLink,
-            widget.data,
+          child: IgnorePointer(
+            child: widget.data.overlayFollowerBuilder(
+              context,
+              _overlayLayerLink,
+              widget.data,
+            ),
           ),
         ),
         child: _ActiveKey(
@@ -384,17 +386,44 @@ class _ActiveKey extends StatefulWidget {
 
 class _ActiveKeyState extends State<_ActiveKey> {
   bool _isPressed = false;
+  bool _hidePending = false;
+
+  @override
+  void didUpdateWidget(_ActiveKey oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.data.isDisabled && !oldWidget.data.isDisabled) {
+      _hideOverlayNow();
+    }
+  }
+
+  void _hideOverlayNow() {
+    _hidePending = false;
+    if (!mounted) return;
+    if (widget.overlayController.isShowing) {
+      widget.overlayController.hide();
+    }
+  }
+
+  /// Defers the overlay hide to a post-frame callback so the popup is
+  /// guaranteed to be painted for at least one frame.  On devices with
+  /// high-frequency touch sampling (e.g. ProMotion 120 Hz on iOS 18),
+  /// pointer-down and pointer-up can arrive within the same vsync window.
+  /// Without this deferral, [show] and [hide] execute in the same build
+  /// pass and the overlay is never actually rendered.
+  void _hideOverlayDeferred() {
+    if (_hidePending) return;
+    _hidePending = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) => _hideOverlayNow());
+  }
 
   @override
   Widget build(BuildContext context) {
     // Disabled keys are not interactive
     if (widget.data.isDisabled) {
-      // If the key becomes disabled while the overlay is showing (e.g. user was
-      // pressing it), we need to hide the overlay to prevent it from getting stuck.
-      if (widget.overlayController.isShowing) {
-        widget.overlayController.hide();
-      }
-
+      // Safety net: if the overlay is still showing when the key becomes
+      // disabled (e.g. due to stagger timing or rapid state changes),
+      // hide it to prevent a stuck overlay controller.
+      _hideOverlayNow();
       return Padding(
         padding: widget.data.padding,
         child: _KeyButton(data: widget.data, isPressed: false),
@@ -407,6 +436,10 @@ class _ActiveKeyState extends State<_ActiveKey> {
         if (!mounted) return;
         widget.data.controller.onKeyDown?.call(widget.data.key);
         if (!widget.data.key.special) {
+          // Defensive reset: if the controller thinks it's still showing
+          // (e.g. after a mass rebuild triggered by enabledKeys change),
+          // force-hide first so the subsequent show() is not a no-op.
+          _hideOverlayNow();
           widget.overlayController.show();
         }
         setState(() {
@@ -416,9 +449,7 @@ class _ActiveKeyState extends State<_ActiveKey> {
       onTapUp: (_) {
         if (!mounted) return;
         widget.data.controller.onKeyUp?.call(widget.data.key);
-        if (widget.overlayController.isShowing) {
-          widget.overlayController.hide();
-        }
+        _hideOverlayDeferred();
         setState(() {
           _isPressed = false;
         });
@@ -426,9 +457,7 @@ class _ActiveKeyState extends State<_ActiveKey> {
       onTapCancel: () {
         if (!mounted) return;
         widget.data.controller.onKeyUp?.call(widget.data.key);
-        if (widget.overlayController.isShowing) {
-          widget.overlayController.hide();
-        }
+        _hideOverlayDeferred();
         setState(() {
           _isPressed = false;
         });

@@ -23,6 +23,13 @@ import 'package:native_virtual_keyboard/src/view/virtual_keyboard_controller.dar
 /// For custom themes, create a new [KeyboardTheme] instance.
 final class VirtualKeyboard extends StatelessWidget {
   static final _log = Logger('VirtualKeyboard');
+  static final bool _isIOS = !kIsWeb && Platform.isIOS;
+
+  /// Cached iOS device info future — platform never changes at runtime,
+  /// so a single static fetch is sufficient for the process lifetime.
+  static final Future<IosDeviceInfo>? _iosInfoFuture = _isIOS
+      ? DeviceInfoPlugin().iosInfo
+      : null;
 
   /// Force a specific platform. If not provided, the platform will be detected automatically.
   final KeyboardPlatform? platform;
@@ -68,7 +75,7 @@ final class VirtualKeyboard extends StatelessWidget {
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: _isIOS && platform == null
-          ? DeviceInfoPlugin().iosInfo
+          ? (_iosInfoFuture ?? Future.value(null))
           : Future.value(null),
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
@@ -76,6 +83,7 @@ final class VirtualKeyboard extends StatelessWidget {
         }
         final effectivePlatform = _getPlatform(snapshot.data);
         _log.fine('Platform identified as: ${effectivePlatform.name}');
+
         return switch (effectivePlatform) {
           KeyboardPlatform.android => AndroidKeyboard(
             controller: controller,
@@ -105,8 +113,6 @@ final class VirtualKeyboard extends StatelessWidget {
       },
     );
   }
-
-  bool get _isIOS => !kIsWeb && Platform.isIOS;
 
   KeyboardPlatform _getPlatform(IosDeviceInfo? iosDeviceInfo) {
     final override = platform;
