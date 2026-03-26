@@ -122,11 +122,13 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
     final animConfig = widget.animationConfig;
     final layout = widget.controller.layout.layout;
 
+    final topBorderColor = theme.topBorderColor;
+
     return Container(
       decoration: BoxDecoration(
         color: theme.backgroundColor,
-        border: theme.topBorderColor != null
-            ? Border(top: BorderSide(color: theme.topBorderColor!, width: 0.7))
+        border: topBorderColor != null
+            ? Border(top: BorderSide(color: topBorderColor, width: 0.7))
             : null,
         borderRadius: dimensions.topBorderRadius > 0
             ? BorderRadius.vertical(
@@ -284,7 +286,7 @@ class _KeyState extends State<_Key> {
     final overlay = Overlay.maybeOf(context);
     if (overlay == null) return;
 
-    _overlayEntry = OverlayEntry(
+    final entry = OverlayEntry(
       builder: (context) => Positioned(
         width: widget.data.overlaySize.width,
         height: widget.data.overlaySize.height,
@@ -305,17 +307,19 @@ class _KeyState extends State<_Key> {
       ),
     );
 
-    overlay.insert(_overlayEntry!);
+    _overlayEntry = entry;
+    overlay.insert(entry);
   }
 
   void _hideOverlay() {
-    if (_overlayEntry != null) {
-      // Only remove if it's currently in the overlay tree
-      if (_overlayEntry!.mounted) {
-        _overlayEntry!.remove();
-      }
-      _overlayEntry!.dispose();
+    final entry = _overlayEntry;
+    if (entry != null) {
       _overlayEntry = null;
+      // Only remove if it's currently in the overlay tree
+      if (entry.mounted) {
+        entry.remove();
+      }
+      entry.dispose();
     }
   }
 
@@ -357,8 +361,8 @@ class _KeyState extends State<_Key> {
 
     if (_overlayEntry != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted && _overlayEntry != null) {
-          _overlayEntry!.markNeedsBuild();
+        if (mounted) {
+          _overlayEntry?.markNeedsBuild();
         }
       });
     }
