@@ -1,3 +1,7 @@
+## 0.2.9
+
+* Fix key press animation (again)
+
 ## 0.2.8
 
 * Fix key press animation (again)
