@@ -122,11 +122,13 @@ class _BaseKeyboardState extends State<BaseKeyboard> {
     final animConfig = widget.animationConfig;
     final layout = widget.controller.layout.layout;
 
+    final topBorderColor = theme.topBorderColor;
+
     return Container(
       decoration: BoxDecoration(
         color: theme.backgroundColor,
-        border: theme.topBorderColor != null
-            ? Border(top: BorderSide(color: theme.topBorderColor!, width: 0.7))
+        border: topBorderColor != null
+            ? Border(top: BorderSide(color: topBorderColor, width: 0.7))
             : null,
         borderRadius: dimensions.topBorderRadius > 0
             ? BorderRadius.vertical(
@@ -275,8 +277,51 @@ class _Key extends StatefulWidget {
 }
 
 class _KeyState extends State<_Key> {
-  final OverlayPortalController _overlayController = OverlayPortalController();
   final LayerLink _overlayLayerLink = LayerLink();
+  OverlayEntry? _overlayEntry;
+
+  void _showOverlay() {
+    if (!mounted || _overlayEntry != null) return;
+
+    final overlay = Overlay.maybeOf(context);
+    if (overlay == null) return;
+
+    final entry = OverlayEntry(
+      builder: (context) => Positioned(
+        width: widget.data.overlaySize.width,
+        height: widget.data.overlaySize.height,
+        bottom: 0,
+        child: IgnorePointer(
+          // Material ancestor is required because OverlayEntry renders at the
+          // top of the overlay tree, outside the widget subtree that normally
+          // provides DefaultTextStyle and other Material defaults.
+          child: Material(
+            type: MaterialType.transparency,
+            child: widget.data.overlayFollowerBuilder(
+              context,
+              _overlayLayerLink,
+              widget.data,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    _overlayEntry = entry;
+    overlay.insert(entry);
+  }
+
+  void _hideOverlay() {
+    final entry = _overlayEntry;
+    if (entry != null) {
+      _overlayEntry = null;
+      // Only remove if it's currently in the overlay tree
+      if (entry.mounted) {
+        entry.remove();
+      }
+      entry.dispose();
+    }
+  }
 
   /// The effective disabled state, which may be delayed for staggered animations
   /// so that the key retains its normal appearance until its turn arrives.
@@ -313,10 +358,19 @@ class _KeyState extends State<_Key> {
         });
       }
     }
+
+    if (_overlayEntry != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _overlayEntry?.markNeedsBuild();
+        }
+      });
+    }
   }
 
   @override
   void dispose() {
+    _hideOverlay();
     _staggerDelayTimer?.cancel();
     super.dispose();
   }
@@ -333,24 +387,10 @@ class _KeyState extends State<_Key> {
 
     Widget child = CompositedTransformTarget(
       link: _overlayLayerLink,
-      child: OverlayPortal(
-        controller: _overlayController,
-        overlayChildBuilder: (context) => Positioned(
-          width: widget.data.overlaySize.width,
-          height: widget.data.overlaySize.height,
-          bottom: 0,
-          child: IgnorePointer(
-            child: widget.data.overlayFollowerBuilder(
-              context,
-              _overlayLayerLink,
-              widget.data,
-            ),
-          ),
-        ),
-        child: _ActiveKey(
-          data: effectiveData,
-          overlayController: _overlayController,
-        ),
+      child: _ActiveKey(
+        data: effectiveData,
+        onShowOverlay: _showOverlay,
+        onHideOverlay: _hideOverlay,
       ),
     );
 
@@ -376,9 +416,14 @@ class _KeyState extends State<_Key> {
 
 class _ActiveKey extends StatefulWidget {
   final KeyParams data;
-  final OverlayPortalController overlayController;
+  final VoidCallback onShowOverlay;
+  final VoidCallback onHideOverlay;
 
-  const _ActiveKey({required this.data, required this.overlayController});
+  const _ActiveKey({
+    required this.data,
+    required this.onShowOverlay,
+    required this.onHideOverlay,
+  });
 
   @override
   State<_ActiveKey> createState() => _ActiveKeyState();
@@ -392,16 +437,20 @@ class _ActiveKeyState extends State<_ActiveKey> {
   void didUpdateWidget(_ActiveKey oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.data.isDisabled && !oldWidget.data.isDisabled) {
-      _hideOverlayNow();
+      _hideOverlayDeferred();
     }
   }
 
   void _hideOverlayNow() {
     _hidePending = false;
     if (!mounted) return;
-    if (widget.overlayController.isShowing) {
-      widget.overlayController.hide();
-    }
+    widget.onHideOverlay();
+  }
+
+  @override
+  void deactivate() {
+    widget.onHideOverlay();
+    super.deactivate();
   }
 
   /// Defers the overlay hide to a post-frame callback so the popup is
@@ -420,10 +469,6 @@ class _ActiveKeyState extends State<_ActiveKey> {
   Widget build(BuildContext context) {
     // Disabled keys are not interactive
     if (widget.data.isDisabled) {
-      // Safety net: if the overlay is still showing when the key becomes
-      // disabled (e.g. due to stagger timing or rapid state changes),
-      // hide it to prevent a stuck overlay controller.
-      _hideOverlayNow();
       return Padding(
         padding: widget.data.padding,
         child: _KeyButton(data: widget.data, isPressed: false),
@@ -436,11 +481,7 @@ class _ActiveKeyState extends State<_ActiveKey> {
         if (!mounted) return;
         widget.data.controller.onKeyDown?.call(widget.data.key);
         if (!widget.data.key.special) {
-          // Defensive reset: if the controller thinks it's still showing
-          // (e.g. after a mass rebuild triggered by enabledKeys change),
-          // force-hide first so the subsequent show() is not a no-op.
-          _hideOverlayNow();
-          widget.overlayController.show();
+          widget.onShowOverlay();
         }
         setState(() {
           _isPressed = true;
