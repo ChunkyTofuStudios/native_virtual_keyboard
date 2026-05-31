@@ -1,3 +1,7 @@
+## 0.3.0
+
+* Upgrade dependencies.
+
 ## 0.2.9
 
 * Fix key press animation (again)
