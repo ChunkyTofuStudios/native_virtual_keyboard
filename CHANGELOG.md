@@ -1,3 +1,7 @@
+## 0.3.2
+
+* Upgrade device_info_plus dep version.
+
 ## 0.3.1
 
 * Relax device_info_plus dep version.
